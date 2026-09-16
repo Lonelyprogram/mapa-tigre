@@ -149,6 +149,16 @@ select {
 .boton-archivo input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .boton-archivo:focus-within { outline: 3px solid var(--foco); outline-offset: 2px; }
 
+/* Selector de año */
+.anios { display: flex; gap: 0; margin: 2px 0 10px; border: 1px solid var(--rio); border-radius: var(--radio-chico); overflow: hidden; }
+.anio {
+  flex: 1; padding: 6px 0; font: inherit; font-weight: 700; font-variant-numeric: tabular-nums;
+  color: var(--rio); background: transparent; border: 0; cursor: pointer;
+}
+.anio + .anio { border-left: 1px solid var(--rio); }
+.anio[aria-pressed="true"] { color: var(--papel); background: var(--rio); }
+.anio:hover:not([aria-pressed="true"]) { background: var(--rio-claro); }
+
 /* Leyenda con histograma: el elemento central del panel */
 .histograma { width: 100%; height: auto; display: block; margin-top: 4px; }
 .histograma .barra { transition: opacity .15s; }
@@ -215,7 +225,9 @@ select {
 .comparacion h3 { margin: 0 0 6px; font-size: .9rem; }
 .comp-item { margin-bottom: 9px; font-size: .85rem; }
 .comp-item .fila { display: flex; justify-content: space-between; gap: 8px; }
-.comp-item .puesto { color: var(--tinta-suave); }
+.comp-item .puesto { color: var(--tinta-suave); white-space: nowrap; text-align: right; }
+.comp-item.activa > .fila span:first-child { font-weight: 700; }
+.serie { margin-top: 3px; font-size: .78rem; color: var(--tinta-suave); font-variant-numeric: tabular-nums; }
 .pista { position: relative; height: 6px; margin-top: 3px; background: var(--rio-claro); border-radius: 3px; }
 .pista span { position: absolute; top: -3px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--rio); border: 2px solid var(--superficie); }
 

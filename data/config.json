@@ -46,9 +46,8 @@
       "fuente": "IGN, SIG250",
       "estilo": {
         "color": "#9A6B2F",
-        "relleno": "#C9A46A",
-        "opacidadRelleno": 0.08,
-        "grosor": 2.5
+        "grosor": 2.5,
+        "soloBorde": true
       },
       "campos": {
         "nombre": "Partido",
@@ -56,6 +55,152 @@
         "sup_km2": "Superficie (km²)",
         "perim_km": "Perímetro (km)"
       }
+    },
+    {
+      "id": "radios",
+      "nombre": "Radios censales",
+      "grupo": "Censos",
+      "archivo": "data/radios_censales.geojson",
+      "geometria": "poligono",
+      "visible": true,
+      "titulo": "radio",
+      "busqueda": "radio",
+      "fuente": "INDEC, Censos 2001 y 2022 (vía Source.Coop, nlebovits/censo-argentino). Radios: Rodríguez y de Grande, CONICET. Los valores de 2001 se estimaron sobre los radios de 2022 por interpolación de áreas.",
+      "estilo": {
+        "color": "#4E6F73",
+        "relleno": "#8DB8A9",
+        "opacidadRelleno": 0.08,
+        "grosor": 0.5
+      },
+      "campos": {
+        "codigo": "Código INDEC",
+        "pob_2022": "Población 2022",
+        "hog_2022": "Hogares 2022",
+        "area_km2": "Superficie (km²)"
+      },
+      "clasificacion": "cuantiles",
+      "clases": 5,
+      "variables": [
+        {
+          "id": "pob",
+          "grupo": "Población",
+          "nombre": "Población",
+          "series": {"2001": "pob_2001", "2022": "pob_2022"},
+          "unidad": "hab.",
+          "decimales": 0,
+          "descripcion": "Personas por radio. Los valores de 2001 son estimaciones sobre los radios de 2022."
+        },
+        {
+          "id": "dens",
+          "grupo": "Población",
+          "nombre": "Densidad",
+          "series": {"2001": "dens_2001", "2022": "dens_2022"},
+          "unidad": "hab./km²",
+          "decimales": 0
+        },
+        {
+          "campo": "var_pob",
+          "grupo": "Población",
+          "nombre": "Variación de población 2001-2022",
+          "unidad": "%",
+          "decimales": 0,
+          "paleta": "divergente",
+          "limites": [-60, 300],
+          "descripcion": "Cambio porcentual de la población entre censos. Los radios que casi no tenían habitantes en 2001 muestran aumentos muy grandes."
+        },
+        {
+          "id": "m14",
+          "grupo": "Población",
+          "nombre": "Población de 0 a 14 años",
+          "series": {"2001": "m14_2001", "2022": "m14_2022"},
+          "unidad": "%",
+          "decimales": 1
+        },
+        {
+          "id": "m65",
+          "grupo": "Población",
+          "nombre": "Población de 65 años y más",
+          "series": {"2001": "m65_2001", "2022": "m65_2022"},
+          "unidad": "%",
+          "decimales": 1
+        },
+        {
+          "id": "nbi",
+          "grupo": "Condiciones de vida",
+          "nombre": "Hogares con NBI",
+          "series": {"2001": "nbi_2001", "2022": "nbi_2022"},
+          "unidad": "%",
+          "decimales": 1,
+          "descripcion": "Hogares con al menos una necesidad básica insatisfecha."
+        },
+        {
+          "campo": "dif_nbi",
+          "grupo": "Condiciones de vida",
+          "nombre": "Cambio en hogares con NBI 2001-2022",
+          "unidad": "p. p.",
+          "decimales": 1,
+          "paleta": "divergente",
+          "invertir": true,
+          "descripcion": "Diferencia en puntos porcentuales. En verde azulado, los radios donde bajó la proporción de hogares con NBI."
+        },
+        {
+          "campo": "sincob_2022",
+          "grupo": "Condiciones de vida",
+          "nombre": "Sin cobertura de salud (2022)",
+          "unidad": "%",
+          "decimales": 1,
+          "descripcion": "Personas sin obra social, prepaga ni plan estatal de salud."
+        },
+        {
+          "id": "cloaca",
+          "grupo": "Servicios",
+          "nombre": "Hogares con desagüe a cloaca",
+          "series": {"2001": "cloaca_2001", "2022": "cloaca_2022"},
+          "unidad": "%",
+          "decimales": 1
+        },
+        {
+          "campo": "dif_cloaca",
+          "grupo": "Servicios",
+          "nombre": "Cambio en desagüe a cloaca 2001-2022",
+          "unidad": "p. p.",
+          "decimales": 1,
+          "paleta": "divergente",
+          "descripcion": "Diferencia en puntos porcentuales. En verde azulado, los radios donde creció la conexión a cloaca."
+        },
+        {
+          "campo": "agua_2022",
+          "grupo": "Servicios",
+          "nombre": "Hogares con agua de red (2022)",
+          "unidad": "%",
+          "decimales": 1
+        },
+        {
+          "campo": "sec_2022",
+          "grupo": "Educación y conectividad",
+          "nombre": "Secundario completo o más (2022)",
+          "unidad": "%",
+          "decimales": 1,
+          "descripcion": "Sobre toda la población con dato, incluidos niños y niñas: sirve para comparar radios, pero da valores más bajos que las cifras oficiales para mayores de 25 años."
+        },
+        {
+          "id": "pc",
+          "grupo": "Educación y conectividad",
+          "nombre": "Hogares con computadora",
+          "series": {"2001": "pc_2001", "2022": "pc_2022"},
+          "unidad": "%",
+          "decimales": 1,
+          "descripcion": "En 2001 cuenta PC con o sin internet; en 2022, computadora o tablet. La comparación es aproximada."
+        },
+        {
+          "campo": "dif_pc",
+          "grupo": "Educación y conectividad",
+          "nombre": "Cambio en hogares con computadora 2001-2022",
+          "unidad": "p. p.",
+          "decimales": 1,
+          "paleta": "divergente"
+        }
+      ]
     },
     {
       "id": "region",
@@ -109,5 +254,10 @@
         }
       ]
     }
-  ]
+  ],
+  "explorarInicial": {
+    "capa": "radios",
+    "variable": "nbi",
+    "anio": "2022"
+  }
 }

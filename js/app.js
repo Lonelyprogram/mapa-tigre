@@ -15,7 +15,7 @@
     config: null,
     mapa: null,
     capas: new Map(),       // id -> { def, datos, capa, stats, error }
-    explorar: { capaId: null, campo: null, rango: null, categorias: null },
+    explorar: { capaId: null, clave: null, anio: null, rango: null, categorias: null },
     seleccion: null,        // { id, capaLeaflet }
     indiceBusqueda: [],
     prueba: null
@@ -51,50 +51,92 @@
     return cortes;
   }
 
+  // ---------- variables: simples, por año (series) y categóricas ----------
+  const claveVar = (v) => v.id || v.campo;
+  const aniosDe = (v) => (v.series ? Object.keys(v.series).sort() : []);
+  const campoDe = (v, anio) => (v.series ? v.series[anio] ?? v.series[aniosDe(v).slice(-1)[0]] : v.campo);
+
+  function cortesDivergentes(nums) {
+    const abs = nums.map(Math.abs);
+    let q1 = cuantiles(abs, 5)[0];
+    let q2 = cuantiles(abs, 5)[2];
+    if (!(q1 > 0)) q1 = (Math.max(...abs) || 1) / 10;
+    if (!(q2 > q1)) q2 = q1 * 2;
+    return [-q2, -q1, q1, q2];
+  }
+
   function calcularStats(def, datos) {
     const stats = {};
     (def.variables || []).forEach((variable) => {
-      const vals = datos.features.map((f) => f.properties[variable.campo]);
+      const clave = claveVar(variable);
       if (variable.tipo === "categoria") {
         const conteos = new Map();
-        vals.forEach((x) => {
+        datos.features.forEach((f) => {
+          const x = f.properties[variable.campo];
           const k = x === null || x === undefined || x === "" ? "Sin dato" : String(x);
           conteos.set(k, (conteos.get(k) || 0) + 1);
         });
         const cats = [...conteos.keys()].sort((a, b) => a.localeCompare(b, "es"));
         const colores = {};
         cats.forEach((c, i) => { colores[c] = c === "Sin dato" ? GRIS : CATEGORICA[i % CATEGORICA.length]; });
-        stats[variable.campo] = { tipo: "categoria", cats, conteos, colores };
+        stats[clave] = { tipo: "categoria", cats, conteos, colores };
         return;
       }
-      const nums = vals.filter(esNumero).map(Number);
-      if (!nums.length) { stats[variable.campo] = { tipo: "vacio" }; return; }
-      const min = Math.min(...nums), max = Math.max(...nums);
-      const unicos = new Set(nums).size;
-      const n = Math.max(1, Math.min(def.clases || 5, unicos, 5));
+      const campos = variable.series ? Object.values(variable.series) : [variable.campo];
+      const porCampo = {};
+      let todos = [];
+      campos.forEach((campo) => {
+        const nums = datos.features.map((f) => f.properties[campo]).filter(esNumero).map(Number);
+        porCampo[campo] = { nums, ordenados: [...nums].sort((a, b) => b - a) };
+        todos = todos.concat(nums);
+      });
+      if (!todos.length) { stats[clave] = { tipo: "vacio" }; return; }
+      const min = Math.min(...todos), max = Math.max(...todos);
       let cortes;
-      if ((def.clasificacion || "cuantiles") === "intervalos") {
-        cortes = Array.from({ length: n - 1 }, (_, i) => min + ((max - min) * (i + 1)) / n);
+      if (variable.paleta === "divergente") {
+        cortes = cortesDivergentes(todos);
       } else {
-        cortes = cuantiles(nums, n);
+        const n = Math.max(1, Math.min(def.clases || 5, new Set(todos).size, 5));
+        cortes = (def.clasificacion || "cuantiles") === "intervalos"
+          ? Array.from({ length: n - 1 }, (_, i) => min + ((max - min) * (i + 1)) / n)
+          : cuantiles(todos, n);
+        cortes = [...new Set(cortes.map((c) => +c.toFixed(10)))].filter((c) => c > min && c < max);
       }
-      cortes = [...new Set(cortes.map((c) => +c.toFixed(10)))].filter((c) => c > min && c < max);
-      const ordenados = [...nums].sort((a, b) => b - a);
-      stats[variable.campo] = { tipo: "numero", min, max, cortes, nums, ordenados };
+      // dominio visible del histograma y del filtro (permite recortar valores extremos)
+      const dmin = variable.limites ? Math.max(min, variable.limites[0]) : min;
+      const dmax = variable.limites ? Math.min(max, variable.limites[1]) : max;
+      stats[clave] = { tipo: "numero", min, max, dmin, dmax, cortes, porCampo };
     });
     return stats;
   }
 
-  function colorDeClase(i, total) {
+  const DIVERGENTE = ["#9A4A2B", "#D6A184", "#E9E4D8", "#8DB8A9", "#16525A"];
+  const DIVERGENTE_OSCURA = ["#D98A68", "#8C5B45", "#3C4745", "#4E8F8E", "#9AD3C6"];
+
+  function colorDeClase(i, total, variable) {
+    if (variable && variable.paleta === "divergente") {
+      const p = oscuro() ? DIVERGENTE_OSCURA : DIVERGENTE;
+      const idx = Math.round((i * (p.length - 1)) / Math.max(1, total - 1));
+      return variable.invertir ? p[p.length - 1 - idx] : p[idx];
+    }
     const rampa = oscuro() ? RAMPA_OSCURA : RAMPA;
     if (total <= 1) return rampa[rampa.length - 1];
-    return rampa[Math.round((i * (rampa.length - 1)) / (total - 1))];
+    const idx = Math.round((i * (rampa.length - 1)) / (total - 1));
+    return variable && variable.invertir ? rampa[rampa.length - 1 - idx] : rampa[idx];
   }
 
   function claseDe(valor, cortes) {
     let i = 0;
     while (i < cortes.length && valor > cortes[i]) i++;
     return i;
+  }
+
+  function variableActiva() {
+    const ex = estado.explorar;
+    if (!ex.capaId || !ex.clave) return null;
+    const reg = estado.capas.get(ex.capaId);
+    const variable = reg.def.variables.find((v) => claveVar(v) === ex.clave);
+    return { reg, variable, st: reg.stats[ex.clave], campo: campoDe(variable, ex.anio) };
   }
 
   // ---------- estilos ----------
@@ -106,6 +148,7 @@
       opacity: e.opacidad ?? 0.95,
       fillColor: e.relleno || e.color || "#16525A",
       fillOpacity: e.opacidadRelleno ?? (def.geometria === "punto" ? 0.9 : 0.2),
+      fill: !e.soloBorde,
       radius: e.radio ?? 6
     };
   }
@@ -113,29 +156,29 @@
   function estiloElemento(def, feature) {
     const base = estiloBase(def);
     const ex = estado.explorar;
-    if (ex.capaId !== def.id || !ex.campo) return base;
-    const st = estado.capas.get(def.id).stats[ex.campo];
-    const v = feature.properties[ex.campo];
+    if (ex.capaId !== def.id || !ex.clave) return base;
+    const { variable, st, campo } = variableActiva();
+    const v = feature.properties[campo];
 
     if (st.tipo === "categoria") {
       const k = v === null || v === undefined || v === "" ? "Sin dato" : String(v);
       if (!ex.categorias.has(k)) return apagado(base, def);
-      return { ...base, fillColor: st.colores[k], fillOpacity: 0.78, color: bordeDato(def), weight: def.geometria === "linea" ? 3 : 0.8, ...(def.geometria === "linea" ? { color: st.colores[k] } : {}) };
+      if (def.geometria === "linea") return { ...base, color: st.colores[k], weight: 3 };
+      return { ...base, fillColor: st.colores[k], fillOpacity: 0.78, color: bordeDato(), weight: 0.8 };
     }
     if (st.tipo !== "numero" || !esNumero(v)) return apagado(base, def);
     const n = Number(v);
     if (ex.rango && (n < ex.rango[0] || n > ex.rango[1])) return apagado(base, def);
-    const col = colorDeClase(claseDe(n, st.cortes), st.cortes.length + 1);
+    const col = colorDeClase(claseDe(n, st.cortes), st.cortes.length + 1, variable);
     if (def.geometria === "linea") return { ...base, color: col, weight: 3.5 };
-    return { ...base, fillColor: col, fillOpacity: 0.82, color: bordeDato(def), weight: 0.8 };
+    return { ...base, fillColor: col, fillOpacity: 0.85, color: bordeDato(), weight: 0.6 };
   }
 
   const bordeDato = () => (oscuro() ? "#0E1A1A" : "#FFFFFF");
 
   function apagado(base, def) {
-    return { ...base, color: GRIS, weight: def.geometria === "linea" ? 1 : 0.6, dashArray: "3 3", fillColor: GRIS, fillOpacity: 0.06, opacity: 0.6 };
+    return { ...base, color: GRIS, weight: def.geometria === "linea" ? 1 : 0.4, dashArray: "3 3", fillColor: GRIS, fillOpacity: 0.06, opacity: 0.5 };
   }
-
   function repintar(id) {
     const c = estado.capas.get(id);
     if (!c || !c.capa) return;
@@ -246,7 +289,7 @@
         fila.className = "capa";
         const idc = `capa-${def.id}`;
         const tipoMuestra = def.geometria === "punto" ? "punto" : def.geometria === "linea" ? "linea" : "";
-        const fondo = def.geometria === "linea" ? "transparent" : b.fillColor;
+        const fondo = def.geometria === "linea" || !b.fill ? "transparent" : b.fillColor;
         fila.innerHTML = `
           <input type="checkbox" id="${idc}" ${reg.capa && estado.mapa.hasLayer(reg.capa) ? "checked" : ""} ${reg.error ? "disabled" : ""}>
           <span class="muestra ${tipoMuestra}" style="border-color:${b.color};background:${fondo}"></span>
@@ -285,9 +328,9 @@
     $("selVariable").addEventListener("change", (e) => elegirVariable(e.target.value));
   }
 
-  function elegirCapa(id, campo) {
+  function elegirCapa(id, clave, anio, rango) {
     const anterior = estado.explorar.capaId;
-    estado.explorar = { capaId: id || null, campo: null, rango: null, categorias: null };
+    estado.explorar = { capaId: id || null, clave: null, anio: null, rango: null, categorias: null };
     if (anterior) repintar(anterior);
     const selVar = $("selVariable");
     $("selCapa").value = id || "";
@@ -303,18 +346,33 @@
     const def = estado.capas.get(id).def;
     alternarCapa(id, true);
     selVar.disabled = false;
-    selVar.innerHTML = def.variables.map((v) => `<option value="${escapar(v.campo)}">${escapar(v.nombre)}</option>`).join("");
+    // agrupa las variables en el desplegable si tienen "grupo"
+    const grupos = new Map();
+    def.variables.forEach((v) => {
+      const g = v.grupo || "";
+      if (!grupos.has(g)) grupos.set(g, []);
+      grupos.get(g).push(v);
+    });
+    selVar.innerHTML = [...grupos].map(([g, vs]) => {
+      const ops = vs.map((v) => `<option value="${escapar(claveVar(v))}">${escapar(v.nombre)}</option>`).join("");
+      return g ? `<optgroup label="${escapar(g)}">${ops}</optgroup>` : ops;
+    }).join("");
     $("fuenteVariable").textContent = def.fuente ? `Fuente: ${def.fuente}` : "";
-    elegirVariable(campo && def.variables.some((v) => v.campo === campo) ? campo : def.variables[0].campo);
+    const existe = clave && def.variables.some((v) => claveVar(v) === clave);
+    elegirVariable(existe ? clave : claveVar(def.variables[0]), anio, rango);
   }
 
-  function elegirVariable(campo, rango) {
+  function elegirVariable(clave, anio, rango) {
     const ex = estado.explorar;
     const reg = estado.capas.get(ex.capaId);
-    const variable = reg.def.variables.find((v) => v.campo === campo);
-    const st = reg.stats[campo];
-    ex.campo = campo;
-    $("selVariable").value = campo;
+    const variable = reg.def.variables.find((v) => claveVar(v) === clave);
+    const st = reg.stats[clave];
+    const anios = aniosDe(variable);
+    ex.clave = clave;
+    // conserva el año elegido si la nueva variable también lo tiene
+    const pedido = anio || ex.anio;
+    ex.anio = anios.length ? (anios.includes(String(pedido)) ? String(pedido) : (variable.anioInicial || anios[anios.length - 1])) : null;
+    $("selVariable").value = clave;
     $("descVariable").textContent = variable.descripcion || "";
     if (st.tipo === "categoria") {
       ex.rango = null;
@@ -329,13 +387,19 @@
     guardarEnUrl();
   }
 
+  function elegirAnio(anio) {
+    estado.explorar.anio = anio;
+    dibujarLeyenda();
+    repintar(estado.explorar.capaId);
+    if (estado.seleccion) mostrarFicha(estado.seleccion.id, estado.seleccion.capaLeaflet);
+    guardarEnUrl();
+  }
+
   function dibujarLeyenda() {
     const ex = estado.explorar;
-    const reg = estado.capas.get(ex.capaId);
-    const variable = reg.def.variables.find((v) => v.campo === ex.campo);
-    const st = reg.stats[ex.campo];
+    const { reg, variable, st, campo } = variableActiva();
     const cont = $("leyenda");
-    const total = reg.datos.features.length;
+    const feats = reg.datos.features;
 
     if (st.tipo === "vacio") {
       cont.innerHTML = `<p class="nota">Esta variable no tiene valores numéricos en la capa. Revisá el nombre del campo en config.json.</p>`;
@@ -344,7 +408,7 @@
 
     if (st.tipo === "categoria") {
       cont.innerHTML = `<ul class="clases">${st.cats.map((c, i) => `
-        <li><label><input type="checkbox" data-cat="${i}" checked>
+        <li><label><input type="checkbox" data-cat="${i}">
           <span class="sw" style="background:${st.colores[c]}"></span>${escapar(c)}
           <span class="n">${st.conteos.get(c)}</span></label></li>`).join("")}</ul>
         <p class="conteo" id="conteo"></p>`;
@@ -362,58 +426,76 @@
       return;
     }
 
-    // Numérica: histograma + clases + filtro por rango
+    const anios = aniosDe(variable);
+    const selectorAnio = anios.length > 1 ? `
+      <div class="anios" role="group" aria-label="Año del censo">
+        ${anios.map((a) => `<button type="button" class="anio" data-anio="${a}" aria-pressed="${a === ex.anio}">${a}</button>`).join("")}
+      </div>` : "";
+
+    const nums = st.porCampo[campo] ? st.porCampo[campo].nums : [];
     const nClases = st.cortes.length + 1;
     const limites = [st.min, ...st.cortes, st.max];
     const W = 300, H = 74;
-    const nBins = Math.max(4, Math.min(24, Math.ceil(Math.sqrt(st.nums.length)) * 2));
-    const ancho = (st.max - st.min) / nBins || 1;
+    const nBins = Math.max(6, Math.min(24, Math.ceil(Math.sqrt(nums.length)) * 2));
+    const ancho = (st.dmax - st.dmin) / nBins || 1;
     const bins = new Array(nBins).fill(0);
-    st.nums.forEach((x) => { bins[Math.min(nBins - 1, Math.floor((x - st.min) / ancho))]++; });
-    const maxBin = Math.max(...bins);
+    nums.forEach((x) => {
+      const b = Math.floor((Math.min(Math.max(x, st.dmin), st.dmax) - st.dmin) / ancho);
+      bins[Math.min(nBins - 1, Math.max(0, b))]++;
+    });
+    const maxBin = Math.max(1, ...bins);
     const bw = W / nBins;
     const barras = bins.map((c, i) => {
-      const medio = st.min + ancho * (i + 0.5);
+      const desde = i === 0 ? st.min : st.dmin + ancho * i;
+      const hasta = i === nBins - 1 ? st.max : st.dmin + ancho * (i + 1);
+      const medio = st.dmin + ancho * (i + 0.5);
       const h = c ? Math.max(3, (c / maxBin) * (H - 4)) : 0;
-      return `<rect class="barra" data-desde="${st.min + ancho * i}" data-hasta="${st.min + ancho * (i + 1)}"
+      return `<rect class="barra" data-desde="${desde}" data-hasta="${hasta}"
         x="${(i * bw + 1).toFixed(1)}" y="${(H - h).toFixed(1)}" width="${(bw - 2).toFixed(1)}" height="${h.toFixed(1)}"
-        fill="${colorDeClase(claseDe(medio, st.cortes), nClases)}" stroke="var(--borde)" stroke-width="0.5"><title>${c} elemento(s)</title></rect>`;
+        fill="${colorDeClase(claseDe(medio, st.cortes), nClases, variable)}" stroke="var(--borde)" stroke-width="0.5"><title>${c} elemento(s)</title></rect>`;
     }).join("");
-    const paso = (st.max - st.min) / 200 || 1;
+    const paso = (st.dmax - st.dmin) / 200 || 1;
+    const valRango = (x, extremo) => (extremo === "min" ? Math.max(x, st.dmin) : Math.min(x, st.dmax));
+    const recorte = st.dmin > st.min || st.dmax < st.max;
 
-    cont.innerHTML = `
-      <svg class="histograma" viewBox="0 0 ${W} ${H + 2}" role="img" aria-label="Distribución de ${escapar(variable.nombre)}">
+    cont.innerHTML = `${selectorAnio}
+      <svg class="histograma" viewBox="0 0 ${W} ${H + 2}" role="img" aria-label="Distribución de ${escapar(variable.nombre)}${ex.anio ? " en " + ex.anio : ""}">
         ${barras}<line x1="0" x2="${W}" y1="${H + 1}" y2="${H + 1}" stroke="var(--apagado)"/>
       </svg>
       <div class="doble-rango">
-        <input type="range" id="rangoMin" min="${st.min}" max="${st.max}" step="${paso}" value="${ex.rango[0]}" aria-label="Valor mínimo">
-        <input type="range" id="rangoMax" min="${st.min}" max="${st.max}" step="${paso}" value="${ex.rango[1]}" aria-label="Valor máximo">
+        <input type="range" id="rangoMin" min="${st.dmin}" max="${st.dmax}" step="${paso}" value="${valRango(ex.rango[0], "min")}" aria-label="Valor mínimo">
+        <input type="range" id="rangoMax" min="${st.dmin}" max="${st.dmax}" step="${paso}" value="${valRango(ex.rango[1], "max")}" aria-label="Valor máximo">
       </div>
       <div class="rango-valores"><span id="valMin"></span><span id="valMax"></span></div>
+      ${recorte ? `<p class="nota">Las barras de los extremos agrupan los valores más allá de ${formatear(st.dmin, variable)} y ${formatear(st.dmax, variable)}.</p>` : ""}
       <p class="conteo" id="conteo"></p>
       <ul class="clases">${limites.slice(0, -1).map((a, i) => `
-        <li><span class="sw" style="background:${colorDeClase(i, nClases)}"></span>
+        <li><span class="sw" style="background:${colorDeClase(i, nClases, variable)}"></span>
           ${formatear(a, variable)} a ${formatear(limites[i + 1], variable)}
-          <span class="n">${st.nums.filter((x) => claseDe(x, st.cortes) === i).length}</span></li>`).join("")}
-      </ul>`;
+          <span class="n">${nums.filter((x) => claseDe(x, st.cortes) === i).length}</span></li>`).join("")}
+      </ul>
+      ${anios.length > 1 ? `<p class="nota">Los colores usan los mismos cortes en todos los años, así se pueden comparar.</p>` : ""}`;
+
+    cont.querySelectorAll("button.anio").forEach((b) => b.addEventListener("click", () => elegirAnio(b.dataset.anio)));
 
     const rMin = $("rangoMin"), rMax = $("rangoMax");
     const alMover = () => {
       let a = +rMin.value, b = +rMax.value;
       if (a > b) { [a, b] = [b, a]; }
-      // los extremos del control se ajustan al valor real para no perder elementos por redondeo
-      ex.rango = [a <= st.min + paso / 2 ? st.min : a, b >= st.max - paso / 2 ? st.max : b];
-      actualizarRango(variable, st);
+      // en los extremos del control se toma el valor real, para no perder elementos recortados
+      ex.rango = [a <= st.dmin + paso / 2 ? st.min : a, b >= st.dmax - paso / 2 ? st.max : b];
+      actualizarRango();
       repintar(ex.capaId);
     };
     rMin.addEventListener("input", alMover);
     rMax.addEventListener("input", alMover);
     rMin.addEventListener("change", guardarEnUrl);
     rMax.addEventListener("change", guardarEnUrl);
-    actualizarRango(variable, st);
+    actualizarRango();
   }
 
-  function actualizarRango(variable, st) {
+  function actualizarRango() {
+    const { variable } = variableActiva();
     const [a, b] = estado.explorar.rango;
     $("valMin").innerHTML = formatear(a, variable);
     $("valMax").innerHTML = formatear(b, variable);
@@ -425,22 +507,22 @@
 
   function actualizarConteo() {
     const ex = estado.explorar;
-    const reg = estado.capas.get(ex.capaId);
-    const st = reg.stats[ex.campo];
+    const { reg, variable, st, campo } = variableActiva();
     const feats = reg.datos.features;
     let visibles, filtrado;
+    const valor = (f) => f.properties[campo];
     if (st.tipo === "categoria") {
-      visibles = feats.filter((f) => ex.categorias.has(f.properties[ex.campo] == null || f.properties[ex.campo] === "" ? "Sin dato" : String(f.properties[ex.campo]))).length;
+      visibles = feats.filter((f) => ex.categorias.has(valor(f) == null || valor(f) === "" ? "Sin dato" : String(valor(f)))).length;
       filtrado = ex.categorias.size < st.cats.length;
     } else {
-      visibles = feats.filter((f) => esNumero(f.properties[ex.campo]) && +f.properties[ex.campo] >= ex.rango[0] && +f.properties[ex.campo] <= ex.rango[1]).length;
+      visibles = feats.filter((f) => esNumero(valor(f)) && +valor(f) >= ex.rango[0] && +valor(f) <= ex.rango[1]).length;
       filtrado = ex.rango[0] > st.min || ex.rango[1] < st.max;
     }
     const el = $("conteo");
     el.innerHTML = `${visibles} de ${feats.length} elementos resaltados` +
       (filtrado ? ` <button type="button" class="boton" id="quitarFiltro">Quitar filtro</button>` : "");
     const q = $("quitarFiltro");
-    if (q) q.addEventListener("click", () => elegirVariable(ex.campo));
+    if (q) q.addEventListener("click", () => elegirVariable(ex.clave, ex.anio));
   }
 
   // ---------- ficha ----------
@@ -460,25 +542,36 @@
     const reg = estado.capas.get(id);
     const def = reg.def;
     const p = l.feature.properties || {};
+    const ex = estado.explorar;
     const campos = def.campos || Object.fromEntries(Object.keys(p).map((k) => [k, k]));
-    const vars = Object.fromEntries((def.variables || []).map((v) => [v.campo, v]));
+    const formatoDe = {};
+    (def.variables || []).forEach((v) => {
+      (v.series ? Object.values(v.series) : [v.campo]).forEach((c) => { formatoDe[c] = v; });
+    });
 
     const filas = Object.entries(campos).map(([k, alias]) =>
-      `<dt>${escapar(alias)}</dt><dd>${formatear(p[k], vars[k])}</dd>`).join("");
+      `<dt>${escapar(alias)}</dt><dd>${typeof p[k] === "string" && !formatoDe[k] ? escapar(p[k]) : formatear(p[k], formatoDe[k])}</dd>`).join("");
 
-    const numericas = (def.variables || []).filter((v) => reg.stats[v.campo] && reg.stats[v.campo].tipo === "numero");
     let comparacion = "";
+    const numericas = (def.variables || []).filter((v) => reg.stats[claveVar(v)] && reg.stats[claveVar(v)].tipo === "numero");
     if (numericas.length && reg.datos.features.length > 1) {
       comparacion = `<div class="comparacion"><h3>Frente al resto de ${escapar(def.nombre.toLowerCase())}</h3>` +
         numericas.map((v) => {
-          const st = reg.stats[v.campo];
-          const x = p[v.campo];
-          if (!esNumero(x)) return `<div class="comp-item"><div class="fila"><span>${escapar(v.nombre)}</span><span class="puesto">Sin dato</span></div></div>`;
-          const pos = st.max > st.min ? ((x - st.min) / (st.max - st.min)) * 100 : 50;
-          const puesto = st.ordenados.indexOf(Number(x)) + 1;
-          return `<div class="comp-item"><div class="fila"><span>${escapar(v.nombre)}</span>
-            <span class="puesto">${puesto}.º de ${st.ordenados.length}</span></div>
-            <div class="pista" title="Mínimo ${formatear(st.min, v)}, máximo ${formatear(st.max, v)}"><span style="left:${pos.toFixed(1)}%"></span></div></div>`;
+          const st = reg.stats[claveVar(v)];
+          const activa = ex.capaId === id && ex.clave === claveVar(v);
+          const anio = activa && ex.anio ? ex.anio : aniosDe(v).slice(-1)[0];
+          const campo = campoDe(v, anio);
+          const x = p[campo];
+          const etiqueta = `${escapar(v.nombre)}${v.series ? ` <small>(${anio})</small>` : ""}`;
+          const serie = v.series && aniosDe(v).length > 1
+            ? `<div class="serie">${aniosDe(v).map((a) => `${a}: ${formatear(p[v.series[a]], v)}`).join(" · ")}</div>` : "";
+          if (!esNumero(x)) return `<div class="comp-item${activa ? " activa" : ""}"><div class="fila"><span>${etiqueta}</span><span class="puesto">Sin dato</span></div>${serie}</div>`;
+          const ord = st.porCampo[campo].ordenados;
+          const pos = st.max > st.min ? ((Math.min(Math.max(x, st.dmin), st.dmax) - st.dmin) / ((st.dmax - st.dmin) || 1)) * 100 : 50;
+          const puesto = ord.indexOf(Number(x)) + 1;
+          return `<div class="comp-item${activa ? " activa" : ""}"><div class="fila"><span>${etiqueta}</span>
+            <span class="puesto">${formatear(x, v)} · ${puesto}.º de ${ord.length}</span></div>
+            <div class="pista"><span style="left:${pos.toFixed(1)}%"></span></div>${serie}</div>`;
         }).join("") + `</div>`;
     }
 
@@ -488,7 +581,6 @@
       <dl>${filas}</dl>${comparacion}`;
     $("ficha").hidden = false;
   }
-
   function cerrarFicha() {
     if (estado.seleccion) {
       const { id, capaLeaflet } = estado.seleccion;
@@ -564,10 +656,11 @@
     ps.set("z", estado.mapa.getZoom());
     ps.set("c", `${c.lat.toFixed(5)},${c.lng.toFixed(5)}`);
     const ex = estado.explorar;
-    if (ex.capaId && ex.campo) {
+    if (ex.capaId && ex.clave) {
       ps.set("capa", ex.capaId);
-      ps.set("var", ex.campo);
-      const st = estado.capas.get(ex.capaId).stats[ex.campo];
+      ps.set("var", ex.clave);
+      if (ex.anio) ps.set("anio", ex.anio);
+      const st = estado.capas.get(ex.capaId).stats[ex.clave];
       if (ex.rango && st && (ex.rango[0] > st.min || ex.rango[1] < st.max)) ps.set("rango", ex.rango.map((x) => +x.toPrecision(8)).join(","));
     }
     history.replaceState(null, "", `${location.pathname}${location.search}#${ps.toString()}`);
@@ -580,17 +673,18 @@
       const [lat, lng] = c.split(",").map(Number);
       if (isFinite(lat) && isFinite(lng)) estado.mapa.setView([lat, lng], Number(z));
     }
+    const valida = (id) => id && estado.capas.get(id) && estado.capas.get(id).datos &&
+      $("selCapa").querySelector(`option[value="${CSS.escape(id)}"]`);
     const capa = ps.get("capa");
-    if (capa && estado.capas.get(capa) && estado.capas.get(capa).datos && $("selCapa").querySelector(`option[value="${CSS.escape(capa)}"]`)) {
-      elegirCapa(capa, ps.get("var"));
+    if (valida(capa)) {
       const r = ps.get("rango");
-      if (r) {
-        const rango = r.split(",").map(Number);
-        if (rango.every(isFinite)) elegirVariable(estado.explorar.campo, rango);
-      }
+      const rango = r ? r.split(",").map(Number) : null;
+      elegirCapa(capa, ps.get("var"), ps.get("anio"), rango && rango.every(isFinite) ? rango : null);
+      return;
     }
+    const ini = estado.config.explorarInicial;
+    if (ini && valida(ini.capa)) elegirCapa(ini.capa, ini.variable, ini.anio);
   }
-
   // ---------- panel en celulares ----------
   function cerrarPanelMovil() { $("panel").classList.remove("abierto"); }
   function prepararPanelMovil() {
@@ -763,7 +857,7 @@
 
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
       estado.capas.forEach((_, id) => repintar(id));
-      if (estado.explorar.campo) dibujarLeyenda();
+      if (estado.explorar.clave) dibujarLeyenda();
     });
   }
 

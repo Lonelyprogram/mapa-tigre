@@ -5,7 +5,7 @@ Sitio estático en Leaflet para publicar capas del Municipio de Tigre. No necesi
 ## Qué hace
 
 - Muestra las capas agrupadas, con descarga en GeoJSON de cada una.
-- Tiene tres mapas base: calles (CARTO), Argenmap (IGN) y satelital (Esri).
+- Tiene cuatro mapas base gratuitos y sin clave: Argenmap gris y Argenmap color (IGN), OpenStreetMap y satelital (Esri).
 - En "Explorar datos" se elige una capa y una variable. El mapa se colorea por clases (cuantiles o intervalos iguales) y el panel muestra un histograma con un filtro por rango. Las variables de texto se filtran por categoría.
 - Al hacer clic en un elemento se abre una ficha con sus atributos y su posición frente al resto de la capa en cada variable.
 - Tiene un buscador por nombre en las capas que lo tengan configurado.
@@ -83,7 +83,20 @@ Cada capa admite:
 | `clasificacion` | `cuantiles` (por defecto) o `intervalos`. |
 | `clases` | Cantidad de clases, de 2 a 5. |
 
-Cada variable admite `campo`, `nombre`, `unidad`, `decimales`, `descripcion` y `tipo` (`categoria` para variables de texto; si no se indica, se trata como número).
+Cada variable admite:
+
+| Clave | Uso |
+|---|---|
+| `campo` | Campo de la capa con el valor. |
+| `id` y `series` | Para una variable con varios años: `"id": "nbi", "series": {"2001": "nbi_2001", "2022": "nbi_2022"}`. Aparece un selector de año y los colores usan los mismos cortes en todos los años. |
+| `nombre`, `grupo` | Nombre visible y grupo dentro del desplegable. |
+| `unidad`, `decimales`, `descripcion` | Formato y texto de ayuda. |
+| `tipo` | `categoria` para variables de texto; si no se indica, se trata como número. |
+| `paleta` | `divergente` para variaciones: los cortes quedan simétricos alrededor de cero. |
+| `invertir` | `true` invierte los colores (por ejemplo, para que una baja del NBI se vea en verde azulado). |
+| `limites` | `[mínimo, máximo]` del histograma y el filtro, para que unos pocos valores extremos no aplasten el gráfico. |
+
+A nivel general, `explorarInicial` define qué capa y variable se muestran al abrir el sitio, y en `estilo` la opción `"soloBorde": true` dibuja solo el contorno (útil para límites que van por encima de otras capas, porque no tapan los clics).
 
 El orden de las capas en `config.json` define qué queda arriba en el mapa: la primera de la lista se dibuja por encima de las demás.
 
@@ -98,6 +111,8 @@ python -m http.server 8000
 y abrir `http://localhost:8000`.
 
 ## Datos incluidos
+
+- `radios_censales.geojson`: radios del Censo 2022 de Tigre con indicadores de 2022 y de 2001. Los datos salen del plugin de QGIS "Censo Argentino" (INDEC vía Source.Coop) y la cartografía de radios es de Rodríguez y de Grande (CONICET). Los conteos de 2001 se llevaron a los radios de 2022 por interpolación de áreas (cada radio de 2001 reparte su población según la superficie que comparte con cada radio de 2022), y los porcentajes se calcularon después de interpolar.
 
 - `tigre_limite.geojson`: límite del partido de Tigre.
 - `region_partidos.geojson`: Tigre y partidos limítrofes, con superficie, perímetro y compacidad (índice de Polsby-Popper) calculados en POSGAR 2007 faja 5.
