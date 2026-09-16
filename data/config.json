@@ -1,0 +1,104 @@
+{
+  "titulo": "Mapa de Tigre",
+  "subtitulo": "Geoportal del Municipio de Tigre",
+  "vista": {
+    "centro": [-34.4, -58.6],
+    "zoom": 11
+  },
+  "limitesNavegacion": [[-34.85, -59.1], [-33.7, -58.05]],
+  "mapasBase": [
+    {
+      "nombre": "Calles",
+      "url": "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+      "atribucion": "&copy; OpenStreetMap &copy; CARTO",
+      "inicial": true
+    },
+    {
+      "nombre": "Argenmap (IGN)",
+      "url": "https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/capabaseargenmap@EPSG%3A3857@png/{z}/{x}/{-y}.png",
+      "atribucion": "Instituto Geográfico Nacional"
+    },
+    {
+      "nombre": "Satelital",
+      "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      "atribucion": "Imágenes &copy; Esri"
+    }
+  ],
+  "capas": [
+    {
+      "id": "limite",
+      "nombre": "Límite de Tigre",
+      "grupo": "Límites",
+      "archivo": "data/tigre_limite.geojson",
+      "geometria": "poligono",
+      "visible": true,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "IGN, SIG250",
+      "estilo": {
+        "color": "#9A6B2F",
+        "relleno": "#C9A46A",
+        "opacidadRelleno": 0.08,
+        "grosor": 2.5
+      },
+      "campos": {
+        "nombre": "Partido",
+        "cabecera": "Ciudad cabecera",
+        "sup_km2": "Superficie (km²)",
+        "perim_km": "Perímetro (km)"
+      }
+    },
+    {
+      "id": "region",
+      "nombre": "Partidos de la región",
+      "grupo": "Límites",
+      "archivo": "data/region_partidos.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "partido",
+      "busqueda": "partido",
+      "fuente": "IGN, SIG250. Superficie, perímetro y compacidad calculados en POSGAR 2007 faja 5.",
+      "estilo": {
+        "color": "#4E6F73",
+        "relleno": "#8DB8A9",
+        "opacidadRelleno": 0.15,
+        "grosor": 1.2
+      },
+      "campos": {
+        "partido": "Partido",
+        "cabecera": "Ciudad cabecera",
+        "sup_km2": "Superficie (km²)",
+        "perim_km": "Perímetro (km)",
+        "compacidad": "Compacidad"
+      },
+      "clasificacion": "cuantiles",
+      "clases": 5,
+      "variables": [
+        {
+          "campo": "sup_km2",
+          "nombre": "Superficie",
+          "unidad": "km²",
+          "decimales": 1,
+          "descripcion": "Superficie total del partido, incluidas las islas del Delta."
+        },
+        {
+          "campo": "perim_km",
+          "nombre": "Perímetro",
+          "unidad": "km",
+          "decimales": 1
+        },
+        {
+          "campo": "compacidad",
+          "nombre": "Compacidad",
+          "decimales": 2,
+          "descripcion": "Índice de Polsby-Popper: 1 es un círculo perfecto; los valores bajos indican formas alargadas o recortadas."
+        },
+        {
+          "campo": "es_tigre",
+          "nombre": "Tigre y vecinos",
+          "tipo": "categoria"
+        }
+      ]
+    }
+  ]
+}

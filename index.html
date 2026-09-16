@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mapa de Tigre</title>
+  <meta name="description" content="Geoportal del Municipio de Tigre: capas, datos y descargas.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="panel" id="panel" aria-label="Capas y datos">
+      <header class="panel-cabecera">
+        <h1 id="titulo">Mapa de Tigre</h1>
+        <p id="subtitulo" class="subtitulo"></p>
+        <button class="boton-panel-cerrar" id="cerrarPanel" type="button" aria-label="Ocultar panel">Ver mapa</button>
+      </header>
+
+      <div class="buscador">
+        <label for="busqueda" class="visualmente-oculto">Buscar en el mapa</label>
+        <input id="busqueda" type="search" placeholder="Buscar un lugar o zona" autocomplete="off"
+               role="combobox" aria-expanded="false" aria-controls="resultados">
+        <ul id="resultados" class="resultados" role="listbox" hidden></ul>
+      </div>
+
+      <section class="seccion" aria-labelledby="t-capas">
+        <h2 id="t-capas">Capas</h2>
+        <div id="listaCapas" class="lista-capas"></div>
+      </section>
+
+      <section class="seccion" id="seccionExplorar" aria-labelledby="t-explorar" hidden>
+        <h2 id="t-explorar">Explorar datos</h2>
+        <div class="campo">
+          <label for="selCapa">Capa</label>
+          <select id="selCapa"></select>
+        </div>
+        <div class="campo">
+          <label for="selVariable">Variable</label>
+          <select id="selVariable" disabled></select>
+        </div>
+        <p id="descVariable" class="nota"></p>
+        <div id="leyenda" class="leyenda"></div>
+        <p id="fuenteVariable" class="fuente"></p>
+      </section>
+
+      <section class="seccion equipo" id="seccionEquipo" aria-labelledby="t-equipo" hidden>
+        <h2 id="t-equipo">Probar una capa nueva</h2>
+        <p class="nota">Cargá un GeoJSON exportado desde QGIS para revisarlo antes de publicarlo. Solo se ve en tu navegador.</p>
+        <label class="boton boton-archivo">
+          Elegir archivo
+          <input id="archivoPrueba" type="file" accept=".geojson,.json,application/geo+json">
+        </label>
+        <div id="informePrueba"></div>
+      </section>
+
+      <footer class="panel-pie">
+        <p>Datos abiertos del Municipio de Tigre. Cada capa se puede descargar en GeoJSON.</p>
+      </footer>
+    </aside>
+
+    <main class="mapa-contenedor">
+      <div id="mapa" role="region" aria-label="Mapa interactivo"></div>
+      <div id="aviso" class="aviso" role="alert" hidden></div>
+      <article id="ficha" class="ficha" aria-live="polite" hidden>
+        <button id="cerrarFicha" class="ficha-cerrar" type="button" aria-label="Cerrar ficha">×</button>
+        <div id="fichaContenido"></div>
+      </article>
+      <button class="boton-panel-abrir" id="abrirPanel" type="button" aria-controls="panel">Capas y datos</button>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
