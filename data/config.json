@@ -8,20 +8,29 @@
   "limitesNavegacion": [[-34.85, -59.1], [-33.7, -58.05]],
   "mapasBase": [
     {
-      "nombre": "Calles",
-      "url": "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-      "atribucion": "&copy; OpenStreetMap &copy; CARTO",
+      "nombre": "Argenmap gris",
+      "url": "https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/mapabase_gris@EPSG%3A3857@png/{z}/{x}/{-y}.png",
+      "atribucion": "<a href=\"https://www.ign.gob.ar/AreaServicios/Argenmap/Introduccion\" target=\"_blank\">Instituto Geográfico Nacional</a> + <a href=\"https://www.osm.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
+      "zoomMaximo": 18,
       "inicial": true
     },
     {
-      "nombre": "Argenmap (IGN)",
+      "nombre": "Argenmap",
       "url": "https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/capabaseargenmap@EPSG%3A3857@png/{z}/{x}/{-y}.png",
-      "atribucion": "Instituto Geográfico Nacional"
+      "atribucion": "<a href=\"https://www.ign.gob.ar/AreaServicios/Argenmap/Introduccion\" target=\"_blank\">Instituto Geográfico Nacional</a> + <a href=\"https://www.osm.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
+      "zoomMaximo": 18
+    },
+    {
+      "nombre": "OpenStreetMap",
+      "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "atribucion": "&copy; <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
+      "zoomMaximo": 19
     },
     {
       "nombre": "Satelital",
       "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-      "atribucion": "Imágenes &copy; Esri"
+      "atribucion": "Imágenes &copy; Esri",
+      "zoomMaximo": 18
     }
   ],
   "capas": [
