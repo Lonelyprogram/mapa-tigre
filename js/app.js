@@ -4,7 +4,8 @@
 
   const RAMPA = ["#F1EBDC", "#C9D8C2", "#8DB8A9", "#4E8F8E", "#16525A"];
   const RAMPA_OSCURA = ["#2E3B32", "#3F6454", "#5E9282", "#8DC3B5", "#CDEDE4"];
-  const CATEGORICA = ["#16525A", "#C9A46A", "#6F8A3E", "#B5566B", "#5B6FA8", "#D98C3A", "#7D5BA6", "#4F9E8F"];
+  const CATEGORICA = ["#16525A", "#C9A46A", "#6F8A3E", "#B5566B", "#5B6FA8", "#D98C3A", "#7D5BA6", "#4F9E8F",
+    "#8A6D3B", "#3E7CB1", "#A4507A", "#7A8B2E"];
   const GRIS = "#9AA5A4";
 
   const $ = (id) => document.getElementById(id);
@@ -148,13 +149,23 @@
       opacity: e.opacidad ?? 0.95,
       fillColor: e.relleno || e.color || "#16525A",
       fillOpacity: e.opacidadRelleno ?? (def.geometria === "punto" ? 0.9 : 0.2),
-      fill: !e.soloBorde,
+      fill: !e.soloBorde && def.geometria !== "linea",
+      dashArray: e.guiones || null,
       radius: e.radio ?? 6
     };
   }
 
+  // radio de los puntos proporcional a la raíz de un campo (por ejemplo, cantidad de avisos)
+  function radioDe(def, feature) {
+    const e = def.estilo || {};
+    const n = Number(feature.properties[e.radioSegun]);
+    if (!e.radioSegun || !isFinite(n) || n <= 0) return e.radio ?? 6;
+    return Math.max(e.radioMin ?? 4, Math.min(e.radioMax ?? 16, (e.radioMin ?? 4) + 1.8 * (Math.sqrt(n) - 1)));
+  }
+
   function estiloElemento(def, feature) {
     const base = estiloBase(def);
+    if (def.geometria === "punto") base.radius = radioDe(def, feature);
     const ex = estado.explorar;
     if (ex.capaId !== def.id || !ex.clave) return base;
     const { variable, st, campo } = variableActiva();
@@ -218,6 +229,8 @@
     mapa.createPane("lineas").style.zIndex = 420;
     mapa.createPane("puntos").style.zIndex = 430;
     mapa.createPane("prueba").style.zIndex = 440;
+    // los puntos se dibujan en canvas: miles de marcadores sin trabar el navegador
+    estado.lienzo = L.canvas({ pane: "puntos", padding: 0.3 });
 
     mapa.on("click", () => cerrarFicha());
     mapa.on("moveend", guardarEnUrl);
@@ -240,7 +253,7 @@
       registro.capa = L.geoJSON(registro.datos, {
         pane: paneDe(def),
         style: (f) => estiloElemento(def, f),
-        pointToLayer: (f, ll) => L.circleMarker(ll, { ...estiloElemento(def, f), pane: "puntos" }),
+        pointToLayer: (f, ll) => L.circleMarker(ll, { ...estiloElemento(def, f), pane: "puntos", renderer: estado.lienzo }),
         onEachFeature: (f, l) => {
           l.on("click", (e) => { L.DomEvent.stopPropagation(e); seleccionar(def.id, l); });
           const t = tituloDe(def, f);

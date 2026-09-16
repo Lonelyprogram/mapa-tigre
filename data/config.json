@@ -43,7 +43,7 @@
       "visible": true,
       "titulo": "nombre",
       "busqueda": "nombre",
-      "fuente": "IGN, SIG250",
+      "fuente": "ARBA, Gerencia de Servicios Catastrales, vía IGN",
       "estilo": {
         "color": "#9A6B2F",
         "grosor": 2.5,
@@ -53,8 +53,519 @@
         "nombre": "Partido",
         "cabecera": "Ciudad cabecera",
         "sup_km2": "Superficie (km²)",
-        "perim_km": "Perímetro (km)"
+        "perim_km": "Perímetro (km)",
+        "fuente": "Fuente"
       }
+    },
+    {
+      "id": "localidades",
+      "nombre": "Localidades",
+      "grupo": "Límites",
+      "archivo": "data/localidades.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "INDEC, Base de Asentamientos Humanos (ubicación de referencia de cada localidad).",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#1C2B2F",
+        "radio": 5,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Localidad",
+        "codigo": "Código INDEC"
+      }
+    },
+    {
+      "id": "educacion",
+      "nombre": "Establecimientos educativos",
+      "grupo": "Educación y salud",
+      "archivo": "data/educacion.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "IGN, sobre el Mapa Educativo Nacional.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#2F6FB0",
+        "radio": 5,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "nivel": "Nivel",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "nivel",
+          "nombre": "Nivel educativo",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "salud",
+      "nombre": "Centros de salud",
+      "grupo": "Educación y salud",
+      "archivo": "data/salud.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "IGN, sobre el Registro Federal de Establecimientos de Salud (SISA).",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#C0392B",
+        "radio": 7,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "categoria": "Categoría",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "categoria",
+          "nombre": "Tipo de centro",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "seguridad",
+      "nombre": "Seguridad",
+      "grupo": "Seguridad y emergencias",
+      "archivo": "data/seguridad.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#34495E",
+        "radio": 7,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "tipo",
+          "nombre": "Tipo de dependencia",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "bomberos",
+      "nombre": "Bomberos",
+      "grupo": "Seguridad y emergencias",
+      "archivo": "data/bomberos.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#E67E22",
+        "radio": 8,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "fuente": "Fuente"
+      }
+    },
+    {
+      "id": "cultura",
+      "nombre": "Instituciones culturales",
+      "grupo": "Cultura, deporte y culto",
+      "archivo": "data/cultura.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#8E44AD",
+        "radio": 7,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "categoria",
+          "nombre": "Tipo de institución",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "deporte",
+      "nombre": "Clubes y polideportivos",
+      "grupo": "Cultura, deporte y culto",
+      "archivo": "data/deporte.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#27AE60",
+        "radio": 7,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "tipo",
+          "nombre": "Tipo",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "culto",
+      "nombre": "Instituciones religiosas",
+      "grupo": "Cultura, deporte y culto",
+      "archivo": "data/culto.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "IGN, sobre el Registro Nacional de Cultos y datos arquidiocesanos.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#7D6B91",
+        "radio": 5,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Denominación",
+        "culto": "Culto",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "culto",
+          "nombre": "Culto",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "estaciones_tren",
+      "nombre": "Estaciones de tren",
+      "grupo": "Transporte",
+      "archivo": "data/estaciones_tren.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#1C2B2F",
+        "relleno": "#FFFFFF",
+        "radio": 7,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Estación",
+        "operador": "Operador"
+      }
+    },
+    {
+      "id": "ferrocarril",
+      "nombre": "Líneas de tren",
+      "grupo": "Transporte",
+      "archivo": "data/ferrocarril.geojson",
+      "geometria": "linea",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#1C2B2F",
+        "grosor": 3,
+        "guiones": "8 5"
+      },
+      "campos": {
+        "nombre": "Línea",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "linea",
+          "nombre": "Línea",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "rutas",
+      "nombre": "Rutas nacionales y provinciales",
+      "grupo": "Transporte",
+      "archivo": "data/rutas.geojson",
+      "geometria": "linea",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "IGN, sobre Vialidad Nacional y la Dirección de Vialidad de la Provincia de Buenos Aires.",
+      "estilo": {
+        "color": "#D98C3A",
+        "grosor": 3.5
+      },
+      "campos": {
+        "nombre": "Ruta",
+        "jurisdiccion": "Jurisdicción",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "jurisdiccion",
+          "nombre": "Jurisdicción",
+          "tipo": "categoria"
+        },
+        {
+          "campo": "nombre",
+          "nombre": "Ruta",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "colectivos",
+      "nombre": "Líneas de colectivo",
+      "grupo": "Transporte",
+      "archivo": "data/colectivos.geojson",
+      "geometria": "linea",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Recorridos de líneas nacionales, provinciales y municipales que pasan por Tigre. Cada ramal aparece por sentido; en las líneas provinciales y municipales el sentido figura con el código de la fuente.",
+      "estilo": {
+        "color": "#5B6FA8",
+        "grosor": 1.6,
+        "opacidad": 0.7
+      },
+      "campos": {
+        "linea": "Línea",
+        "ramal": "Ramal",
+        "sentido": "Sentido",
+        "jurisdiccion": "Jurisdicción"
+      },
+      "variables": [
+        {
+          "campo": "jurisdiccion",
+          "nombre": "Jurisdicción",
+          "tipo": "categoria"
+        },
+        {
+          "campo": "linea",
+          "nombre": "Línea",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "espacios_verdes",
+      "nombre": "Plazas y espacios verdes",
+      "grupo": "Espacios verdes e industria",
+      "archivo": "data/espacios_verdes.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#4E7A2E",
+        "relleno": "#6F8A3E",
+        "opacidadRelleno": 0.55,
+        "grosor": 1
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "sup_m2": "Superficie (m²)",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "sup_m2",
+          "nombre": "Superficie",
+          "unidad": "m²",
+          "decimales": 0
+        },
+        {
+          "campo": "tipo",
+          "nombre": "Tipo",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "industrias",
+      "nombre": "Parques industriales y logísticos",
+      "grupo": "Espacios verdes e industria",
+      "archivo": "data/areas_industriales.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#6B5530",
+        "relleno": "#8A6D3B",
+        "opacidadRelleno": 0.4,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "sup_ha": "Superficie (ha)",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "tipo",
+          "nombre": "Tipo",
+          "tipo": "categoria"
+        },
+        {
+          "campo": "sup_ha",
+          "nombre": "Superficie",
+          "unidad": "ha",
+          "decimales": 1
+        }
+      ]
+    },
+    {
+      "id": "estaciones_servicio",
+      "nombre": "Estaciones de servicio",
+      "grupo": "Servicios",
+      "archivo": "data/estaciones_servicio.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "IGN, sobre datos de la Secretaría de Energía.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#B8860B",
+        "radio": 5,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "bandera": "Bandera",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "bandera",
+          "nombre": "Bandera",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "reciclaje",
+      "nombre": "Centros de reciclaje",
+      "grupo": "Servicios",
+      "archivo": "data/reciclaje.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#3E8E5A",
+        "radio": 7,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "fuente": "Fuente"
+      }
+    },
+    {
+      "id": "oferta",
+      "nombre": "Oferta en venta (sep. 2026)",
+      "grupo": "Mercado inmobiliario",
+      "archivo": "data/oferta_inmobiliaria_2026_09.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "etiqueta",
+      "fuente": "Monitor del Mercado Inmobiliario de Tigre, Edición N°2 (corte 1/9/2026), sobre avisos de ZonaProp, Argenprop y MercadoLibre. Es precio de oferta publicada, no de cierre, en dólares al MEP (ARS 1.535). Según el propio monitor, la base completa puede sobreestimar el nivel de precios cerca de 5 % por avisos ya dados de baja, y la zona asignada a cada aviso no siempre coincide con su ubicación.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#B57C22",
+        "grosor": 0.6,
+        "radioSegun": "avisos",
+        "radioMin": 4,
+        "radioMax": 15
+      },
+      "campos": {
+        "usd_m2": "Precio de oferta (USD/m²)",
+        "avisos": "Avisos en este punto",
+        "zona": "Zona asignada por el monitor",
+        "ubicacion": "Ubicación"
+      },
+      "clasificacion": "cuantiles",
+      "clases": 5,
+      "variables": [
+        {
+          "campo": "usd_m2",
+          "nombre": "Precio de oferta por m²",
+          "unidad": "USD/m²",
+          "decimales": 0,
+          "limites": [600, 5000],
+          "descripcion": "Mediana de los avisos de casas y departamentos en cada punto. En departamentos se divide por superficie total y en casas por superficie cubierta. El tamaño del círculo indica cuántos avisos hay."
+        },
+        {
+          "campo": "avisos",
+          "nombre": "Cantidad de avisos",
+          "decimales": 0,
+          "limites": [1, 40]
+        },
+        {
+          "campo": "ubicacion",
+          "nombre": "Calidad de la ubicación",
+          "tipo": "categoria",
+          "descripcion": "Los puntos con 10 avisos o más suelen ser coordenadas genéricas que los portales asignan a un barrio entero, no la ubicación real de cada propiedad."
+        },
+        {
+          "campo": "zona",
+          "nombre": "Zona asignada por el monitor",
+          "tipo": "categoria"
+        }
+      ]
     },
     {
       "id": "radios",
@@ -65,7 +576,7 @@
       "visible": true,
       "titulo": "radio",
       "busqueda": "radio",
-      "fuente": "INDEC, Censos 2001 y 2022 (vía Source.Coop, nlebovits/censo-argentino). Radios: Rodríguez y de Grande, CONICET. Los valores de 2001 se estimaron sobre los radios de 2022 por interpolación de áreas.",
+      "fuente": "INDEC, Censos 2001 y 2022 (vía Source.Coop, nlebovits/censo-argentino). Radios: Rodríguez y de Grande, CONICET. Los valores de 2001 se estimaron sobre los radios de 2022 por interpolación de áreas. El precio de oferta sale del Monitor del Mercado Inmobiliario de Tigre, ed. N°2 (septiembre 2026).",
       "estilo": {
         "color": "#4E6F73",
         "relleno": "#8DB8A9",
@@ -199,6 +710,21 @@
           "unidad": "p. p.",
           "decimales": 1,
           "paleta": "divergente"
+        },
+        {
+          "campo": "oferta_usd_m2",
+          "grupo": "Mercado inmobiliario",
+          "nombre": "Precio de oferta por m² (sep. 2026)",
+          "unidad": "USD/m²",
+          "decimales": 0,
+          "descripcion": "Mediana ponderada de los avisos del Monitor Inmobiliario (ed. N°2) que caen en cada radio. Solo radios con 5 avisos o más y sin contar coordenadas compartidas por 10 avisos o más. Es precio de oferta, no de cierre."
+        },
+        {
+          "campo": "oferta_avisos",
+          "grupo": "Mercado inmobiliario",
+          "nombre": "Avisos en venta (sep. 2026)",
+          "decimales": 0,
+          "limites": [5, 80]
         }
       ]
     },

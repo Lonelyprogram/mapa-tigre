@@ -112,9 +112,15 @@ y abrir `http://localhost:8000`.
 
 ## Datos incluidos
 
+- `oferta_inmobiliaria_2026_09.geojson`: puntos de oferta en venta (casas y departamentos) del Monitor del Mercado Inmobiliario de Tigre, Edición N°2, corte 1/9/2026. Cada punto trae la mediana de USD/m² y la cantidad de avisos en esa coordenada. Se descartaron los puntos fuera del partido. Los puntos con 10 avisos o más se marcan como coordenadas compartidas.
+- En `radios_censales.geojson`, los campos `oferta_usd_m2` y `oferta_avisos` resumen esos avisos por radio (mediana ponderada, mínimo 5 avisos, sin coordenadas compartidas).
+
 - `radios_censales.geojson`: radios del Censo 2022 de Tigre con indicadores de 2022 y de 2001. Los datos salen del plugin de QGIS "Censo Argentino" (INDEC vía Source.Coop) y la cartografía de radios es de Rodríguez y de Grande (CONICET). Los conteos de 2001 se llevaron a los radios de 2022 por interpolación de áreas (cada radio de 2001 reparte su población según la superficie que comparte con cada radio de 2022), y los porcentajes se calcularon después de interpolar.
 
-- `tigre_limite.geojson`: límite del partido de Tigre.
+- `tigre_limite.geojson`: límite del partido de Tigre (ARBA, vía IGN).
+- Equipamiento y servicios del IGN: `educacion`, `salud`, `seguridad`, `bomberos`, `cultura`, `deporte`, `culto`, `estaciones_servicio`, `reciclaje`, `espacios_verdes` y `areas_industriales`. Los archivos originales tenían los acentos dañados (se habían guardado con otra codificación); se repararon con un diccionario de español y una lista revisada a mano de nombres propios. Conviene corregir en origen cualquier nombre que haya quedado mal.
+- Transporte: `estaciones_tren`, `ferrocarril` y `rutas` (IGN) y `colectivos` (recorridos nacionales, provinciales y municipales).
+- `localidades.geojson`: punto de referencia de cada localidad según INDEC.
 - `region_partidos.geojson`: Tigre y partidos limítrofes, con superficie, perímetro y compacidad (índice de Polsby-Popper) calculados en POSGAR 2007 faja 5.
 
-Ambas capas provienen del SIG250 del Instituto Geográfico Nacional (a través del repositorio `mgaitan/departamentos_argentina`). Es cartografía a escala 1:250.000: sirve de referencia general, pero conviene reemplazarla por el límite oficial municipal cuando esté disponible.
+`region_partidos.geojson` proviene del SIG250 del Instituto Geográfico Nacional (a través del repositorio `mgaitan/departamentos_argentina`). Es cartografía a escala 1:250.000: sirve de referencia general, pero conviene reemplazarla por el límite oficial municipal cuando esté disponible.
