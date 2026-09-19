@@ -65,7 +65,7 @@ body {
   background: var(--rio); color: #FFFFFF;
 }
 .marca { display: flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; }
-.marca img { height: 32px; width: auto; }
+.marca img { height: 34px; width: auto; padding: 3px 6px; background: #FFFFFF; border-radius: 6px; }
 .marca-texto { font-size: 1.05rem; letter-spacing: .12em; }
 .marca-texto strong { font-weight: 700; }
 .barra-nav { display: flex; align-items: center; gap: 18px; font-size: .9rem; }
