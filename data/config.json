@@ -671,55 +671,52 @@
       }
     },
     {
-      "id": "oferta",
-      "nombre": "Mercado inmobiliario (sep. 2026)",
+      "id": "valor_suelo",
+      "nombre": "Valor del suelo (sep. 2026)",
       "grupo": "Espacio público",
-      "archivo": "data/oferta_inmobiliaria_2026_09.geojson",
-      "geometria": "punto",
+      "archivo": "data/valor_suelo.geojson",
+      "geometria": "poligono",
       "visible": false,
-      "titulo": "etiqueta",
-      "fuente": "Monitor del Mercado Inmobiliario de Tigre, Edición N°2 (corte 1/9/2026), sobre avisos de ZonaProp, Argenprop y MercadoLibre. Es precio de oferta publicada, no de cierre, en dólares al MEP (ARS 1.535). Según el propio monitor, la base completa puede sobreestimar el nivel de precios cerca de 5 % por avisos ya dados de baja, y la zona asignada a cada aviso no siempre coincide con su ubicación.",
+      "titulo": "nombre",
+      "fuente": "Elaboración propia sobre el Monitor del Mercado Inmobiliario de Tigre, Edición N°2 (corte 1/9/2026), con avisos de venta de casas y departamentos de ZonaProp, Argenprop y MercadoLibre. Es precio de oferta publicada, no de cierre, en dólares al MEP. Cada celda mide 500 m de lado a lado y resume al menos 5 avisos; se descartaron las coordenadas genéricas que los portales asignan a barrios enteros.",
       "estilo": {
         "color": "#FFFFFF",
-        "relleno": "#B57C22",
-        "grosor": 0.6,
-        "radioSegun": "avisos",
-        "radioMin": 4,
-        "radioMax": 15
+        "relleno": "#8DB8A9",
+        "opacidadRelleno": 0.8,
+        "grosor": 0.4,
+        "colorearPor": "usd_m2"
       },
       "campos": {
-        "usd_m2": "Precio de oferta (USD/m²)",
-        "avisos": "Avisos en este punto",
-        "zona": "Zona asignada por el monitor",
-        "ubicacion": "Ubicación"
+        "usd_m2": "Valor mediano (USD/m²)",
+        "rango": "Rango habitual (USD/m²)",
+        "avisos": "Avisos en la celda",
+        "puntos": "Ubicaciones distintas",
+        "dif_partido": "Diferencia con la mediana del partido"
       },
       "clasificacion": "cuantiles",
       "clases": 5,
       "variables": [
         {
           "campo": "usd_m2",
-          "nombre": "Precio de oferta por m²",
+          "nombre": "Valor mediano por m²",
           "unidad": "USD/m²",
           "decimales": 0,
-          "limites": [600, 5000],
-          "descripcion": "Mediana de los avisos de casas y departamentos en cada punto. En departamentos se divide por superficie total y en casas por superficie cubierta. El tamaño del círculo indica cuántos avisos hay."
+          "descripcion": "Mediana de los avisos de la celda, ponderada por cantidad de avisos. En departamentos el precio se divide por superficie total y en casas por superficie cubierta."
+        },
+        {
+          "campo": "dif_partido",
+          "nombre": "Diferencia con la mediana del partido",
+          "unidad": "%",
+          "decimales": 0,
+          "paleta": "divergente",
+          "descripcion": "Cuánto se aparta la celda de la mediana de Tigre, que es 2.042 USD/m²."
         },
         {
           "campo": "avisos",
           "nombre": "Cantidad de avisos",
           "decimales": 0,
-          "limites": [1, 40]
-        },
-        {
-          "campo": "ubicacion",
-          "nombre": "Calidad de la ubicación",
-          "tipo": "categoria",
-          "descripcion": "Los puntos con 10 avisos o más suelen ser coordenadas genéricas que los portales asignan a un barrio entero, no la ubicación real de cada propiedad."
-        },
-        {
-          "campo": "zona",
-          "nombre": "Zona asignada por el monitor",
-          "tipo": "categoria"
+          "limites": [5, 60],
+          "descripcion": "Cuántos avisos respaldan el valor de la celda. Las celdas con pocos avisos son menos confiables."
         }
       ]
     },

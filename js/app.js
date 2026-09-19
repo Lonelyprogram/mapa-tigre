@@ -181,7 +181,21 @@
       if (isFinite(n)) base.weight = Math.min(def.estilo.grosorMax ?? 9, (def.estilo.grosorMin ?? 1.5) + (def.estilo.grosorPaso ?? 0.6) * (n - 1));
     }
     const ex = estado.explorar;
-    if (ex.capaId !== def.id || !ex.clave) return base;
+    if (ex.capaId !== def.id || !ex.clave) {
+      // capas que ya se muestran coloreadas por un valor, sin pasar por "Explorar datos"
+      const cp = def.estilo && def.estilo.colorearPor;
+      if (cp) {
+        const reg = estado.capas.get(def.id);
+        const v = (def.variables || []).find((x) => x.campo === cp);
+        const st = reg && reg.stats[cp];
+        const n = Number(feature.properties[cp]);
+        if (st && st.tipo === "numero" && esNumero(n)) {
+          const col = colorDeClase(claseDe(n, st.cortes), st.cortes.length + 1, v);
+          return { ...base, fillColor: col, fillOpacity: 0.8, color: bordeDato(), weight: 0.4 };
+        }
+      }
+      return base;
+    }
     const { variable, st, campo } = variableActiva();
     const v = feature.properties[campo];
 
