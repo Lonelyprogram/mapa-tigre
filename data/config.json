@@ -653,22 +653,32 @@
       "nombre": "Gestión de residuos",
       "grupo": "Espacio público",
       "archivo": "data/reciclaje.geojson",
-      "geometria": "punto",
+      "geometria": "poligono",
       "visible": false,
       "titulo": "nombre",
       "busqueda": "nombre",
       "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
       "estilo": {
-        "color": "#FFFFFF",
+        "color": "#2F6B45",
         "relleno": "#3E8E5A",
-        "radio": 7,
-        "grosor": 1.2
+        "opacidadRelleno": 0.4,
+        "grosor": 1.4,
+        "radio": 7
       },
       "campos": {
         "nombre": "Nombre",
         "tipo": "Tipo",
+        "sup_ha": "Superficie (ha)",
+        "en_tigre": "Dentro de Tigre",
         "fuente": "Fuente"
-      }
+      },
+      "variables": [
+        {
+          "campo": "tipo",
+          "nombre": "Tipo",
+          "tipo": "categoria"
+        }
+      ]
     },
     {
       "id": "valor_suelo",
