@@ -58,7 +58,24 @@ body {
   clip: rect(0 0 0 0); white-space: nowrap;
 }
 
-.app { display: flex; height: 100vh; height: 100dvh; }
+/* Barra superior de IDEAR Tigre */
+.barra {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  height: 56px; padding: 0 20px;
+  background: var(--rio); color: #FFFFFF;
+}
+.marca { display: flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; }
+.marca img { height: 32px; width: auto; }
+.marca-texto { font-size: 1.05rem; letter-spacing: .12em; }
+.marca-texto strong { font-weight: 700; }
+.barra-nav { display: flex; align-items: center; gap: 18px; font-size: .9rem; }
+.barra-nav a { color: inherit; text-decoration: none; padding: 4px 0; border-bottom: 2px solid transparent; }
+.barra-nav a[aria-current="page"] { border-bottom-color: var(--foco); }
+.barra-nav a:hover { border-bottom-color: rgba(255, 255, 255, .5); }
+.proximamente { opacity: .65; }
+:root:not([data-theme="light"]) .barra { color: var(--papel); }
+
+.app { display: flex; height: calc(100vh - 56px); height: calc(100dvh - 56px); }
 
 /* Panel lateral */
 .panel {
@@ -71,8 +88,7 @@ body {
   flex-direction: column;
 }
 .panel-cabecera {
-  padding: 22px 20px 14px;
-  border-top: 5px solid var(--rio);
+  padding: 20px 20px 14px;
   position: relative;
 }
 .panel-cabecera h1 {
@@ -126,7 +142,14 @@ body {
 .muestra { width: 18px; height: 14px; border-radius: 2px; border: 2px solid; }
 .muestra.punto { width: 12px; height: 12px; border-radius: 50%; justify-self: center; }
 .muestra.linea { height: 0; border-width: 2px 0 0; }
-.capa a { font-size: .8rem; color: var(--rio); }
+.descargas { display: flex; gap: 6px; align-items: center; font-size: .78rem; }
+.capa a, .capa .enlace { font-size: .78rem; color: var(--rio); }
+.enlace { padding: 0; font-family: inherit; background: none; border: 0; border-bottom: 1px solid currentColor; cursor: pointer; }
+.muestra.linea.multicolor { height: 3px; border: 0; border-radius: 2px; }
+.muestra.multicolor {
+  background: linear-gradient(90deg, #16525A 0 25%, #C9A46A 25% 50%, #6F8A3E 50% 75%, #B5566B 75% 100%);
+  border-color: transparent;
+}
 .capa .error { grid-column: 3 / -1; font-size: .8rem; color: #B3261E; }
 
 /* Controles */
@@ -169,6 +192,7 @@ select {
 .clases .n { margin-left: auto; color: var(--tinta-suave); font-variant-numeric: tabular-nums; }
 .clases label { display: flex; align-items: center; gap: 8px; width: 100%; cursor: pointer; }
 
+.acciones-cat { display: flex; gap: 6px; margin-top: 8px; }
 .doble-rango { position: relative; height: 28px; margin-top: 2px; }
 .doble-rango input {
   position: absolute; left: 0; right: 0; top: 6px; width: 100%; margin: 0;
@@ -212,7 +236,7 @@ select {
 }
 .ficha h2 { margin: 0 28px 2px 0; font-size: 1.25rem; line-height: 1.2; }
 .ficha .capa-origen { margin: 0 0 10px; font-size: .82rem; color: var(--tinta-suave); }
-.ficha dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: .9rem; }
+.ficha dl { margin: 0; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 4px 12px; font-size: .9rem; }
 .ficha dt { color: var(--tinta-suave); }
 .ficha dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .ficha-cerrar {
@@ -246,7 +270,9 @@ select {
 .boton-panel-abrir, .boton-panel-cerrar { display: none; }
 
 @media (max-width: 760px) {
-  .app { display: block; }
+  .barra { height: 48px; padding: 0 14px; }
+  .barra-nav .proximamente { display: none; }
+  .app { display: block; position: relative; height: calc(100dvh - 48px); }
   .panel {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 1500;
     width: auto; max-height: 72dvh;
@@ -254,7 +280,7 @@ select {
     transform: translateY(105%); transition: transform .25s ease;
   }
   .panel.abierto { transform: none; }
-  .panel-cabecera { border-top: 0; padding-top: 16px; }
+  .panel-cabecera { padding-top: 16px; }
   .panel-cabecera h1 { font-size: 1.4rem; }
   .mapa-contenedor { position: absolute; inset: 0; }
   .boton-panel-abrir {

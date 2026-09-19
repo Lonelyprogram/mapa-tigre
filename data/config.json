@@ -1,6 +1,6 @@
 {
-  "titulo": "Mapa de Tigre",
-  "subtitulo": "Geoportal del Municipio de Tigre",
+  "titulo": "Geoportal de Tigre",
+  "subtitulo": "Datos abiertos del partido de Tigre · IDEAR Tigre",
   "vista": {
     "centro": [-34.4, -58.6],
     "zoom": 11
@@ -37,7 +37,7 @@
     {
       "id": "limite",
       "nombre": "Límite de Tigre",
-      "grupo": "Límites",
+      "grupo": "Desarrollo urbano",
       "archivo": "data/tigre_limite.geojson",
       "geometria": "poligono",
       "visible": true,
@@ -60,10 +60,10 @@
     {
       "id": "localidades",
       "nombre": "Localidades",
-      "grupo": "Límites",
+      "grupo": "Desarrollo urbano",
       "archivo": "data/localidades.geojson",
       "geometria": "punto",
-      "visible": false,
+      "visible": true,
       "titulo": "nombre",
       "busqueda": "nombre",
       "fuente": "INDEC, Base de Asentamientos Humanos (ubicación de referencia de cada localidad).",
@@ -71,7 +71,7 @@
         "color": "#FFFFFF",
         "relleno": "#1C2B2F",
         "radio": 5,
-        "grosor": 1.2
+        "grosor": 1.5
       },
       "campos": {
         "nombre": "Localidad",
@@ -79,9 +79,164 @@
       }
     },
     {
+      "id": "barrios_populares",
+      "nombre": "Barrios populares (RENABAP)",
+      "grupo": "Desarrollo urbano",
+      "archivo": "data/barrios_populares.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Registro Nacional de Barrios Populares (RENABAP), Subsecretaría de Integración Socio Urbana. Versión del registro con 6.467 barrios en todo el país (base 2023). Familias y viviendas son estimaciones del propio registro; los servicios describen el modo en que accede la mayoría del barrio.",
+      "estilo": {
+        "color": "#7A2E22",
+        "relleno": "#B5566B",
+        "opacidadRelleno": 0.45,
+        "grosor": 1.2
+      },
+      "campos": {
+        "servicios_txt": "Servicios por red",
+        "nombre_barrio": "Barrio",
+        "localidad": "Localidad",
+        "id_renabap": "ID RENABAP",
+        "tipo": "Tipo",
+        "decada": "Década de origen",
+        "familias": "Familias (estimado)",
+        "viviendas": "Viviendas (estimado)",
+        "sup_ha": "Superficie (ha)",
+        "energia_electrica": "Energía eléctrica",
+        "agua_corriente": "Agua",
+        "efluentes_cloacales": "Desagüe cloacal",
+        "cocina": "Cocina",
+        "calefaccion": "Calefacción",
+        "titulo_propiedad": "Título de propiedad"
+      },
+      "clasificacion": "cuantiles",
+      "clases": 5,
+      "variables": [
+        {
+          "campo": "servicios_txt",
+          "grupo": "Servicios",
+          "nombre": "Servicios conectados a la red",
+          "tipo": "categoria",
+          "colores": {
+            "0 de 3 servicios": "#9A4A2B",
+            "1 de 3 servicios": "#D6A184",
+            "2 de 3 servicios": "#8DB8A9",
+            "3 de 3 servicios": "#16525A"
+          },
+          "descripcion": "Cuántos de estos tres servicios llegan por red en la mayoría del barrio: luz (formal o regular), agua (formal o regular) y cloaca."
+        },
+        {
+          "campo": "energia",
+          "nombre": "Energía eléctrica",
+          "tipo": "categoria",
+          "grupo": "Servicios"
+        },
+        {
+          "campo": "agua",
+          "nombre": "Agua",
+          "tipo": "categoria",
+          "grupo": "Servicios"
+        },
+        {
+          "campo": "cloaca",
+          "nombre": "Desagüe cloacal",
+          "tipo": "categoria",
+          "grupo": "Servicios"
+        },
+        {
+          "campo": "familias",
+          "grupo": "Tamaño",
+          "nombre": "Familias",
+          "decimales": 0
+        },
+        {
+          "campo": "dens_viv_ha",
+          "grupo": "Tamaño",
+          "nombre": "Densidad de viviendas",
+          "unidad": "viv./ha",
+          "decimales": 0
+        },
+        {
+          "campo": "sup_ha",
+          "grupo": "Tamaño",
+          "nombre": "Superficie",
+          "unidad": "ha",
+          "decimales": 1
+        },
+        {
+          "campo": "tipo",
+          "nombre": "Tipo de barrio",
+          "tipo": "categoria",
+          "descripcion": "El RENABAP distingue villas (trama irregular y alta densidad) de asentamientos (trama más regular, en general loteos informales).",
+          "grupo": "Origen y tipo"
+        },
+        {
+          "campo": "decada",
+          "nombre": "Década de origen",
+          "tipo": "categoria",
+          "grupo": "Origen y tipo"
+        }
+      ]
+    },
+    {
+      "id": "region",
+      "nombre": "Municipios limítrofes",
+      "grupo": "Desarrollo urbano",
+      "archivo": "data/region_partidos.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "partido",
+      "busqueda": "partido",
+      "fuente": "IGN, SIG250. Superficie, perímetro y compacidad calculados en POSGAR 2007 faja 5.",
+      "estilo": {
+        "color": "#4E6F73",
+        "relleno": "#8DB8A9",
+        "opacidadRelleno": 0.15,
+        "grosor": 1.2
+      },
+      "campos": {
+        "partido": "Partido",
+        "cabecera": "Ciudad cabecera",
+        "sup_km2": "Superficie (km²)",
+        "perim_km": "Perímetro (km)",
+        "compacidad": "Compacidad"
+      },
+      "clasificacion": "cuantiles",
+      "clases": 5,
+      "variables": [
+        {
+          "campo": "sup_km2",
+          "nombre": "Superficie",
+          "unidad": "km²",
+          "decimales": 1,
+          "descripcion": "Superficie total del partido, incluidas las islas del Delta."
+        },
+        {
+          "campo": "perim_km",
+          "nombre": "Perímetro",
+          "unidad": "km",
+          "decimales": 1
+        },
+        {
+          "campo": "compacidad",
+          "nombre": "Compacidad",
+          "decimales": 2,
+          "descripcion": "Índice de Polsby-Popper: 1 es un círculo perfecto; los valores bajos indican formas alargadas o recortadas."
+        },
+        {
+          "campo": "es_tigre",
+          "nombre": "Tigre y vecinos",
+          "tipo": "categoria"
+        }
+      ],
+      "ordenMapa": 95
+    },
+    {
       "id": "educacion",
       "nombre": "Establecimientos educativos",
-      "grupo": "Educación y salud",
+      "grupo": "Desarrollo humano",
       "archivo": "data/educacion.geojson",
       "geometria": "punto",
       "visible": false,
@@ -111,7 +266,7 @@
     {
       "id": "salud",
       "nombre": "Centros de salud",
-      "grupo": "Educación y salud",
+      "grupo": "Desarrollo humano",
       "archivo": "data/salud.geojson",
       "geometria": "punto",
       "visible": false,
@@ -139,60 +294,9 @@
       ]
     },
     {
-      "id": "seguridad",
-      "nombre": "Seguridad",
-      "grupo": "Seguridad y emergencias",
-      "archivo": "data/seguridad.geojson",
-      "geometria": "punto",
-      "visible": false,
-      "titulo": "nombre",
-      "busqueda": "nombre",
-      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
-      "estilo": {
-        "color": "#FFFFFF",
-        "relleno": "#34495E",
-        "radio": 7,
-        "grosor": 1.2
-      },
-      "campos": {
-        "nombre": "Nombre",
-        "tipo": "Tipo",
-        "fuente": "Fuente"
-      },
-      "variables": [
-        {
-          "campo": "tipo",
-          "nombre": "Tipo de dependencia",
-          "tipo": "categoria"
-        }
-      ]
-    },
-    {
-      "id": "bomberos",
-      "nombre": "Bomberos",
-      "grupo": "Seguridad y emergencias",
-      "archivo": "data/bomberos.geojson",
-      "geometria": "punto",
-      "visible": false,
-      "titulo": "nombre",
-      "busqueda": "nombre",
-      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
-      "estilo": {
-        "color": "#FFFFFF",
-        "relleno": "#E67E22",
-        "radio": 8,
-        "grosor": 1.2
-      },
-      "campos": {
-        "nombre": "Nombre",
-        "tipo": "Tipo",
-        "fuente": "Fuente"
-      }
-    },
-    {
       "id": "cultura",
       "nombre": "Instituciones culturales",
-      "grupo": "Cultura, deporte y culto",
+      "grupo": "Desarrollo humano",
       "archivo": "data/cultura.geojson",
       "geometria": "punto",
       "visible": false,
@@ -221,7 +325,7 @@
     {
       "id": "deporte",
       "nombre": "Clubes y polideportivos",
-      "grupo": "Cultura, deporte y culto",
+      "grupo": "Desarrollo humano",
       "archivo": "data/deporte.geojson",
       "geometria": "punto",
       "visible": false,
@@ -250,7 +354,7 @@
     {
       "id": "culto",
       "nombre": "Instituciones religiosas",
-      "grupo": "Cultura, deporte y culto",
+      "grupo": "Desarrollo humano",
       "archivo": "data/culto.geojson",
       "geometria": "punto",
       "visible": false,
@@ -278,9 +382,60 @@
       ]
     },
     {
+      "id": "seguridad",
+      "nombre": "Seguridad",
+      "grupo": "Seguridad",
+      "archivo": "data/seguridad.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#34495E",
+        "radio": 7,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "tipo",
+          "nombre": "Tipo de dependencia",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "bomberos",
+      "nombre": "Bomberos",
+      "grupo": "Seguridad",
+      "archivo": "data/bomberos.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#E67E22",
+        "radio": 8,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "fuente": "Fuente"
+      }
+    },
+    {
       "id": "estaciones_tren",
       "nombre": "Estaciones de tren",
-      "grupo": "Transporte",
+      "grupo": "Movilidad",
       "archivo": "data/estaciones_tren.geojson",
       "geometria": "punto",
       "visible": false,
@@ -301,7 +456,7 @@
     {
       "id": "ferrocarril",
       "nombre": "Líneas de tren",
-      "grupo": "Transporte",
+      "grupo": "Movilidad",
       "archivo": "data/ferrocarril.geojson",
       "geometria": "linea",
       "visible": false,
@@ -326,9 +481,44 @@
       ]
     },
     {
+      "id": "colectivos",
+      "nombre": "Líneas de colectivo",
+      "grupo": "Movilidad",
+      "archivo": "data/colectivos.geojson",
+      "geometria": "linea",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Recorridos de líneas nacionales, provinciales y municipales que pasan por Tigre. Cada línea reúne todos sus ramales y sentidos.",
+      "estilo": {
+        "color": "#5B6FA8",
+        "grosor": 2.2,
+        "opacidad": 0.85,
+        "colorSegun": "linea"
+      },
+      "campos": {
+        "linea": "Línea",
+        "ramales": "Ramales",
+        "jurisdiccion": "Jurisdicción"
+      },
+      "variables": [
+        {
+          "campo": "linea",
+          "nombre": "Línea",
+          "tipo": "categoria",
+          "descripcion": "Cada línea tiene su color. Usá «Ocultar todas» y marcá las que quieras ver."
+        },
+        {
+          "campo": "jurisdiccion",
+          "nombre": "Jurisdicción",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
       "id": "rutas",
       "nombre": "Rutas nacionales y provinciales",
-      "grupo": "Transporte",
+      "grupo": "Movilidad",
       "archivo": "data/rutas.geojson",
       "geometria": "linea",
       "visible": false,
@@ -358,43 +548,9 @@
       ]
     },
     {
-      "id": "colectivos",
-      "nombre": "Líneas de colectivo",
-      "grupo": "Transporte",
-      "archivo": "data/colectivos.geojson",
-      "geometria": "linea",
-      "visible": false,
-      "titulo": "nombre",
-      "busqueda": "nombre",
-      "fuente": "Recorridos de líneas nacionales, provinciales y municipales que pasan por Tigre. Cada ramal aparece por sentido; en las líneas provinciales y municipales el sentido figura con el código de la fuente.",
-      "estilo": {
-        "color": "#5B6FA8",
-        "grosor": 1.6,
-        "opacidad": 0.7
-      },
-      "campos": {
-        "linea": "Línea",
-        "ramal": "Ramal",
-        "sentido": "Sentido",
-        "jurisdiccion": "Jurisdicción"
-      },
-      "variables": [
-        {
-          "campo": "jurisdiccion",
-          "nombre": "Jurisdicción",
-          "tipo": "categoria"
-        },
-        {
-          "campo": "linea",
-          "nombre": "Línea",
-          "tipo": "categoria"
-        }
-      ]
-    },
-    {
       "id": "espacios_verdes",
       "nombre": "Plazas y espacios verdes",
-      "grupo": "Espacios verdes e industria",
+      "grupo": "Espacio público",
       "archivo": "data/espacios_verdes.geojson",
       "geometria": "poligono",
       "visible": false,
@@ -430,7 +586,7 @@
     {
       "id": "industrias",
       "nombre": "Parques industriales y logísticos",
-      "grupo": "Espacios verdes e industria",
+      "grupo": "Espacio público",
       "archivo": "data/areas_industriales.geojson",
       "geometria": "poligono",
       "visible": false,
@@ -466,7 +622,7 @@
     {
       "id": "estaciones_servicio",
       "nombre": "Estaciones de servicio",
-      "grupo": "Servicios",
+      "grupo": "Espacio público",
       "archivo": "data/estaciones_servicio.geojson",
       "geometria": "punto",
       "visible": false,
@@ -494,8 +650,8 @@
     },
     {
       "id": "reciclaje",
-      "nombre": "Centros de reciclaje",
-      "grupo": "Servicios",
+      "nombre": "Gestión de residuos",
+      "grupo": "Espacio público",
       "archivo": "data/reciclaje.geojson",
       "geometria": "punto",
       "visible": false,
@@ -516,8 +672,8 @@
     },
     {
       "id": "oferta",
-      "nombre": "Oferta en venta (sep. 2026)",
-      "grupo": "Mercado inmobiliario",
+      "nombre": "Mercado inmobiliario (sep. 2026)",
+      "grupo": "Espacio público",
       "archivo": "data/oferta_inmobiliaria_2026_09.geojson",
       "geometria": "punto",
       "visible": false,
@@ -573,10 +729,10 @@
       "grupo": "Censos",
       "archivo": "data/radios_censales.geojson",
       "geometria": "poligono",
-      "visible": true,
+      "visible": false,
       "titulo": "radio",
       "busqueda": "radio",
-      "fuente": "INDEC, Censos 2001 y 2022 (vía Source.Coop, nlebovits/censo-argentino). Radios: Rodríguez y de Grande, CONICET. Los valores de 2001 se estimaron sobre los radios de 2022 por interpolación de áreas. El precio de oferta sale del Monitor del Mercado Inmobiliario de Tigre, ed. N°2 (septiembre 2026).",
+      "fuente": "INDEC, Censos 2001 y 2022 (vía Source.Coop, nlebovits/censo-argentino). Radios: Rodríguez y de Grande, CONICET. Los valores de 2001 se estimaron sobre los radios de 2022 por interpolación de áreas. El precio de oferta sale del Monitor del Mercado Inmobiliario de Tigre, ed. N°2 (septiembre 2026). Los barrios populares provienen del RENABAP (base 2023).",
       "estilo": {
         "color": "#4E6F73",
         "relleno": "#8DB8A9",
@@ -725,65 +881,27 @@
           "nombre": "Avisos en venta (sep. 2026)",
           "decimales": 0,
           "limites": [5, 80]
-        }
-      ]
-    },
-    {
-      "id": "region",
-      "nombre": "Partidos de la región",
-      "grupo": "Límites",
-      "archivo": "data/region_partidos.geojson",
-      "geometria": "poligono",
-      "visible": false,
-      "titulo": "partido",
-      "busqueda": "partido",
-      "fuente": "IGN, SIG250. Superficie, perímetro y compacidad calculados en POSGAR 2007 faja 5.",
-      "estilo": {
-        "color": "#4E6F73",
-        "relleno": "#8DB8A9",
-        "opacidadRelleno": 0.15,
-        "grosor": 1.2
-      },
-      "campos": {
-        "partido": "Partido",
-        "cabecera": "Ciudad cabecera",
-        "sup_km2": "Superficie (km²)",
-        "perim_km": "Perímetro (km)",
-        "compacidad": "Compacidad"
-      },
-      "clasificacion": "cuantiles",
-      "clases": 5,
-      "variables": [
+        },
         {
-          "campo": "sup_km2",
-          "nombre": "Superficie",
-          "unidad": "km²",
+          "campo": "renabap_pct",
+          "grupo": "Barrios populares",
+          "nombre": "Superficie en barrios populares",
+          "unidad": "%",
           "decimales": 1,
-          "descripcion": "Superficie total del partido, incluidas las islas del Delta."
+          "limites": [0, 100],
+          "descripcion": "Parte de la superficie del radio que ocupan barrios del RENABAP.",
+          "cortes": [0.1, 10, 25, 50]
         },
         {
-          "campo": "perim_km",
-          "nombre": "Perímetro",
-          "unidad": "km",
-          "decimales": 1
-        },
-        {
-          "campo": "compacidad",
-          "nombre": "Compacidad",
-          "decimales": 2,
-          "descripcion": "Índice de Polsby-Popper: 1 es un círculo perfecto; los valores bajos indican formas alargadas o recortadas."
-        },
-        {
-          "campo": "es_tigre",
-          "nombre": "Tigre y vecinos",
-          "tipo": "categoria"
+          "campo": "renabap_fam",
+          "grupo": "Barrios populares",
+          "nombre": "Familias en barrios populares",
+          "decimales": 0,
+          "descripcion": "Estimación: las familias de cada barrio se reparten entre los radios según la superficie que comparten.",
+          "cortes": [0.5, 50, 150, 400]
         }
-      ]
+      ],
+      "ordenMapa": 90
     }
-  ],
-  "explorarInicial": {
-    "capa": "radios",
-    "variable": "nbi",
-    "anio": "2022"
-  }
+  ]
 }

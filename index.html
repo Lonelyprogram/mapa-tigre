@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mapa de Tigre</title>
-  <meta name="description" content="Geoportal del Municipio de Tigre: capas, datos y descargas.">
+  <title>Geoportal de Tigre · IDEAR Tigre</title>
+  <meta name="description" content="Geoportal de Tigre: capas, datos abiertos y descargas del partido de Tigre. Una iniciativa de IDEAR Tigre.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺️</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,10 +13,21 @@
   <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
+  <header class="barra">
+    <a class="marca" href="./" aria-label="IDEAR Tigre, inicio">
+      <img src="img/logo-idear.png" alt="" onerror="this.remove()">
+      <span class="marca-texto">IDEAR<strong>TIGRE</strong></span>
+    </a>
+    <nav class="barra-nav" aria-label="Secciones">
+      <a href="./" aria-current="page">Geoportal</a>
+      <span class="proximamente" title="En preparación">Datos de Tigre · próximamente</span>
+    </nav>
+  </header>
+
   <div class="app">
     <aside class="panel" id="panel" aria-label="Capas y datos">
       <header class="panel-cabecera">
-        <h1 id="titulo">Mapa de Tigre</h1>
+        <h1 id="titulo">Geoportal de Tigre</h1>
         <p id="subtitulo" class="subtitulo"></p>
         <button class="boton-panel-cerrar" id="cerrarPanel" type="button" aria-label="Ocultar panel">Ver mapa</button>
       </header>

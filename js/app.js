@@ -5,7 +5,8 @@
   const RAMPA = ["#F1EBDC", "#C9D8C2", "#8DB8A9", "#4E8F8E", "#16525A"];
   const RAMPA_OSCURA = ["#2E3B32", "#3F6454", "#5E9282", "#8DC3B5", "#CDEDE4"];
   const CATEGORICA = ["#16525A", "#C9A46A", "#6F8A3E", "#B5566B", "#5B6FA8", "#D98C3A", "#7D5BA6", "#4F9E8F",
-    "#8A6D3B", "#3E7CB1", "#A4507A", "#7A8B2E"];
+    "#8A6D3B", "#3E7CB1", "#A4507A", "#7A8B2E", "#2F6F4F", "#C2622C", "#4C5FA0", "#96703E",
+    "#B04A4A", "#3D8C8C", "#6E5AA8", "#7F9B3A"];
   const GRIS = "#9AA5A4";
 
   const $ = (id) => document.getElementById(id);
@@ -77,9 +78,11 @@
           const k = x === null || x === undefined || x === "" ? "Sin dato" : String(x);
           conteos.set(k, (conteos.get(k) || 0) + 1);
         });
-        const cats = [...conteos.keys()].sort((a, b) => a.localeCompare(b, "es"));
+        const cats = [...conteos.keys()].sort((a, b) => a.localeCompare(b, "es", { numeric: true }));
         const colores = {};
-        cats.forEach((c, i) => { colores[c] = c === "Sin dato" ? GRIS : CATEGORICA[i % CATEGORICA.length]; });
+        cats.forEach((c, i) => {
+          colores[c] = (variable.colores && variable.colores[c]) || (c === "Sin dato" ? GRIS : CATEGORICA[i % CATEGORICA.length]);
+        });
         stats[clave] = { tipo: "categoria", cats, conteos, colores };
         return;
       }
@@ -94,11 +97,13 @@
       if (!todos.length) { stats[clave] = { tipo: "vacio" }; return; }
       const min = Math.min(...todos), max = Math.max(...todos);
       let cortes;
-      if (variable.paleta === "divergente") {
+      if (Array.isArray(variable.cortes)) {
+        cortes = variable.cortes.filter((c) => c > min && c < max);
+      } else if (variable.paleta === "divergente") {
         cortes = cortesDivergentes(todos);
       } else {
-        const n = Math.max(1, Math.min(def.clases || 5, new Set(todos).size, 5));
-        cortes = (def.clasificacion || "cuantiles") === "intervalos"
+        const n = Math.max(1, Math.min(variable.clases || def.clases || 5, new Set(todos).size, 5));
+        cortes = (variable.clasificacion || def.clasificacion || "cuantiles") === "intervalos"
           ? Array.from({ length: n - 1 }, (_, i) => min + ((max - min) * (i + 1)) / n)
           : cuantiles(todos, n);
         cortes = [...new Set(cortes.map((c) => +c.toFixed(10)))].filter((c) => c > min && c < max);
@@ -165,7 +170,16 @@
 
   function estiloElemento(def, feature) {
     const base = estiloBase(def);
+    const cs = def.estilo && def.estilo.colorSegun;
+    if (cs) {
+      const col = colorFijo(def, feature.properties[cs]);
+      if (col) { base.color = def.geometria === "linea" ? col : base.color; base.fillColor = col; }
+    }
     if (def.geometria === "punto") base.radius = radioDe(def, feature);
+    if (def.geometria === "linea" && def.estilo && def.estilo.grosorSegun) {
+      const n = Number(feature.properties[def.estilo.grosorSegun]);
+      if (isFinite(n)) base.weight = Math.min(def.estilo.grosorMax ?? 9, (def.estilo.grosorMin ?? 1.5) + (def.estilo.grosorPaso ?? 0.6) * (n - 1));
+    }
     const ex = estado.explorar;
     if (ex.capaId !== def.id || !ex.clave) return base;
     const { variable, st, campo } = variableActiva();
@@ -174,20 +188,36 @@
     if (st.tipo === "categoria") {
       const k = v === null || v === undefined || v === "" ? "Sin dato" : String(v);
       if (!ex.categorias.has(k)) return apagado(base, def);
-      if (def.geometria === "linea") return { ...base, color: st.colores[k], weight: 3 };
+      if (def.geometria === "linea") return { ...base, color: st.colores[k], weight: Math.max(base.weight, 2.5), opacity: 0.95, dashArray: null };
       return { ...base, fillColor: st.colores[k], fillOpacity: 0.78, color: bordeDato(), weight: 0.8 };
     }
     if (st.tipo !== "numero" || !esNumero(v)) return apagado(base, def);
     const n = Number(v);
     if (ex.rango && (n < ex.rango[0] || n > ex.rango[1])) return apagado(base, def);
     const col = colorDeClase(claseDe(n, st.cortes), st.cortes.length + 1, variable);
-    if (def.geometria === "linea") return { ...base, color: col, weight: 3.5 };
+    if (def.geometria === "linea") return { ...base, color: col, weight: Math.max(base.weight, 2.5), opacity: 0.95 };
     return { ...base, fillColor: col, fillOpacity: 0.85, color: bordeDato(), weight: 0.6 };
   }
 
   const bordeDato = () => (oscuro() ? "#0E1A1A" : "#FFFFFF");
 
+  // color estable por valor: el definido en config.json o uno de la paleta, por orden alfabético
+  function colorFijo(def, valor) {
+    const e = def.estilo || {};
+    const k = valor === null || valor === undefined || valor === "" ? "Sin dato" : String(valor);
+    if (e.colores && e.colores[k]) return e.colores[k];
+    const reg = estado.capas.get(def.id);
+    if (!reg || !reg.datos) return null;
+    if (!reg.clavesColor) {
+      reg.clavesColor = [...new Set(reg.datos.features.map((f) => String(f.properties[e.colorSegun] ?? "Sin dato")))]
+        .sort((a, b) => a.localeCompare(b, "es", { numeric: true }));
+    }
+    const i = reg.clavesColor.indexOf(k);
+    return i < 0 ? null : CATEGORICA[i % CATEGORICA.length];
+  }
+
   function apagado(base, def) {
+    if (def.geometria === "linea") return { ...base, color: GRIS, weight: 1, dashArray: null, opacity: 0.12 };
     return { ...base, color: GRIS, weight: def.geometria === "linea" ? 1 : 0.4, dashArray: "3 3", fillColor: GRIS, fillOpacity: 0.06, opacity: 0.5 };
   }
   function repintar(id) {
@@ -274,8 +304,15 @@
   }
 
   // La primera capa de config.json queda arriba de todo
+  function ordenDibujo() {
+    return estado.config.capas
+      .map((def, i) => ({ def, o: def.ordenMapa ?? i }))
+      .sort((a, b) => a.o - b.o)
+      .map((x) => x.def);
+  }
+
   function ordenarCapas() {
-    [...estado.config.capas].reverse().forEach((def) => {
+    [...ordenDibujo()].reverse().forEach((def) => {
       const reg = estado.capas.get(def.id);
       if (reg && reg.capa && estado.mapa.hasLayer(reg.capa)) reg.capa.bringToFront();
     });
@@ -298,6 +335,7 @@
       defs.forEach((def) => {
         const reg = estado.capas.get(def.id);
         const b = estiloBase(def);
+        const multicolor = def.estilo && def.estilo.colorSegun;
         const fila = document.createElement("div");
         fila.className = "capa";
         const idc = `capa-${def.id}`;
@@ -305,16 +343,45 @@
         const fondo = def.geometria === "linea" || !b.fill ? "transparent" : b.fillColor;
         fila.innerHTML = `
           <input type="checkbox" id="${idc}" ${reg.capa && estado.mapa.hasLayer(reg.capa) ? "checked" : ""} ${reg.error ? "disabled" : ""}>
-          <span class="muestra ${tipoMuestra}" style="border-color:${b.color};background:${fondo}"></span>
+          <span class="muestra ${tipoMuestra}${multicolor ? " multicolor" : ""}" style="${multicolor ? "" : `border-color:${b.color};background:${fondo}`}"></span>
           <label for="${idc}">${escapar(def.nombre)}</label>
-          ${reg.error ? "" : `<a href="${escapar(def.archivo)}" download title="Descargar ${escapar(def.nombre)} en GeoJSON">Descargar</a>`}
+          ${reg.error ? "" : `<span class="descargas"><a href="${escapar(def.archivo)}" download title="Descargar ${escapar(def.nombre)} como GeoJSON, para usar en QGIS">GeoJSON</a>
+            <button type="button" class="enlace" data-csv="${escapar(def.id)}" title="Descargar la tabla de datos de ${escapar(def.nombre)} en CSV, para abrir en Excel">CSV</button></span>`}
           ${reg.error ? `<span class="error">${escapar(reg.error)}</span>` : ""}`;
+        const btn = fila.querySelector("button[data-csv]");
+        if (btn) btn.addEventListener("click", () => descargarCsv(def.id));
         const chk = fila.querySelector("input");
         chk.addEventListener("change", () => alternarCapa(def.id, chk.checked));
         div.appendChild(fila);
       });
       cont.appendChild(div);
     });
+  }
+
+  // CSV con todos los atributos de la capa, más el centro de cada elemento
+  function descargarCsv(id) {
+    const reg = estado.capas.get(id);
+    if (!reg || !reg.datos) return;
+    const feats = reg.datos.features;
+    const alias = reg.def.campos || {};
+    const claves = [...new Set(feats.flatMap((f) => Object.keys(f.properties || {})))];
+    const cabecera = claves.map((k) => alias[k] || k).concat(["lat", "lon"]);
+    const celda = (v) => {
+      if (v === null || v === undefined) return "";
+      const t = String(v).replace(/"/g, '""');
+      return /[;"\n]/.test(t) ? `"${t}"` : t;
+    };
+    const filas = feats.map((f) => {
+      const capa = L.geoJSON(f);
+      const c = capa.getBounds().isValid() ? capa.getBounds().getCenter() : { lat: "", lng: "" };
+      return claves.map((k) => celda(f.properties[k])).concat([
+        c.lat === "" ? "" : c.lat.toFixed(6), c.lng === "" ? "" : c.lng.toFixed(6)]).join(";");
+    });
+    const csv = "\uFEFF" + [cabecera.map(celda).join(";"), ...filas].join("\r\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const a = Object.assign(document.createElement("a"), { href: url, download: `${id}.csv` });
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   function alternarCapa(id, visible) {
@@ -424,7 +491,17 @@
         <li><label><input type="checkbox" data-cat="${i}">
           <span class="sw" style="background:${st.colores[c]}"></span>${escapar(c)}
           <span class="n">${st.conteos.get(c)}</span></label></li>`).join("")}</ul>
+        ${st.cats.length > 3 ? `<div class="acciones-cat">
+          <button type="button" class="boton" data-todas="1">Mostrar todas</button>
+          <button type="button" class="boton" data-todas="0">Ocultar todas</button></div>` : ""}
         <p class="conteo" id="conteo"></p>`;
+      cont.querySelectorAll("button[data-todas]").forEach((btn) => btn.addEventListener("click", () => {
+        ex.categorias = btn.dataset.todas === "1" ? new Set(st.cats) : new Set();
+        cont.querySelectorAll("input[data-cat]").forEach((chk) => { chk.checked = ex.categorias.has(st.cats[+chk.dataset.cat]); });
+        repintar(ex.capaId);
+        actualizarConteo();
+        guardarEnUrl();
+      }));
       cont.querySelectorAll("input[data-cat]").forEach((chk) => {
         chk.checked = ex.categorias.has(st.cats[+chk.dataset.cat]);
         chk.addEventListener("change", () => {
@@ -558,17 +635,18 @@
     const ex = estado.explorar;
     const campos = def.campos || Object.fromEntries(Object.keys(p).map((k) => [k, k]));
     const formatoDe = {};
-    (def.variables || []).forEach((v) => {
+    (def.variables || []).filter((v) => v.tipo !== "categoria").forEach((v) => {
       (v.series ? Object.values(v.series) : [v.campo]).forEach((c) => { formatoDe[c] = v; });
     });
+    const textual = new Set((def.variables || []).filter((v) => v.tipo === "categoria").map((v) => v.campo));
 
     const filas = Object.entries(campos).map(([k, alias]) =>
-      `<dt>${escapar(alias)}</dt><dd>${typeof p[k] === "string" && !formatoDe[k] ? escapar(p[k]) : formatear(p[k], formatoDe[k])}</dd>`).join("");
+      `<dt>${escapar(alias)}</dt><dd>${(typeof p[k] === "string" && !formatoDe[k]) || textual.has(k) ? escapar(p[k] ?? "Sin dato") : formatear(p[k], formatoDe[k])}</dd>`).join("");
 
     let comparacion = "";
     const numericas = (def.variables || []).filter((v) => reg.stats[claveVar(v)] && reg.stats[claveVar(v)].tipo === "numero");
     if (numericas.length && reg.datos.features.length > 1) {
-      comparacion = `<div class="comparacion"><h3>Frente al resto de ${escapar(def.nombre.toLowerCase())}</h3>` +
+      comparacion = `<div class="comparacion"><h3>Frente al resto de ${escapar(def.nombre.charAt(0).toLowerCase() + def.nombre.slice(1))}</h3>` +
         numericas.map((v) => {
           const st = reg.stats[claveVar(v)];
           const activa = ex.capaId === id && ex.clave === claveVar(v);
@@ -852,13 +930,13 @@
       return;
     }
     const cfg = estado.config;
-    document.title = cfg.titulo || document.title;
+    document.title = cfg.titulo ? `${cfg.titulo} · IDEAR Tigre` : document.title;
     $("titulo").textContent = cfg.titulo || "";
     $("subtitulo").textContent = cfg.subtitulo || "";
 
     estado.mapa = crearMapa(cfg);
     await Promise.all((cfg.capas || []).map(cargarCapa));
-    [...cfg.capas].reverse().forEach((def) => {
+    [...ordenDibujo()].reverse().forEach((def) => {
       const reg = estado.capas.get(def.id);
       if (def.visible && reg.capa) reg.capa.addTo(estado.mapa);
     });

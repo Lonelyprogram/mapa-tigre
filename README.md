@@ -1,10 +1,16 @@
-# Mapa de Tigre — geoportal
+# Geoportal de Tigre — IDEAR Tigre
 
 Sitio estático en Leaflet para publicar capas del Municipio de Tigre. No necesita servidor ni base de datos: todo se define en `data/config.json` y las capas son archivos GeoJSON dentro de `data/`.
 
+## Marca y encabezado
+
+La barra superior muestra el logo de IDEAR Tigre y el menú de secciones. El logo se toma de `img/logo-idear.png`: subí ahí el archivo (PNG o SVG con fondo transparente, unos 64 px de alto) y aparece solo. Si el archivo no está, queda el texto "IDEAR TIGRE" y no se rompe nada.
+
+Para usar el dominio propio (ideartigre.com), en Settings → Pages del repositorio se carga el dominio en "Custom domain" y en el panel del proveedor del dominio se apuntan los registros que GitHub indica.
+
 ## Qué hace
 
-- Muestra las capas agrupadas, con descarga en GeoJSON de cada una.
+- Muestra las capas agrupadas en categorías (Desarrollo urbano, Desarrollo humano, Seguridad, Movilidad, Espacio público y Censos), cada una con dos descargas: **GeoJSON** (para QGIS) y **CSV** (la tabla de atributos con las coordenadas del centro de cada elemento, para abrir en Excel).
 - Tiene cuatro mapas base gratuitos y sin clave: Argenmap gris y Argenmap color (IGN), OpenStreetMap y satelital (Esri).
 - En "Explorar datos" se elige una capa y una variable. El mapa se colorea por clases (cuantiles o intervalos iguales) y el panel muestra un histograma con un filtro por rango. Las variables de texto se filtran por categoría.
 - Al hacer clic en un elemento se abre una ficha con sus atributos y su posición frente al resto de la capa en cada variable.
@@ -77,7 +83,8 @@ Cada capa admite:
 | `titulo` | Campo que se usa como título de la ficha y en el globo al pasar el mouse. |
 | `busqueda` | Campo en el que busca el buscador. Si falta, la capa no aparece en la búsqueda. |
 | `fuente` | Texto de la fuente, se muestra en "Explorar datos". |
-| `estilo` | `color` (borde), `relleno`, `opacidadRelleno`, `grosor`, `radio` (puntos). |
+| `estilo` | `color` (borde), `relleno`, `opacidadRelleno`, `grosor`, `radio` (puntos), `guiones` (línea punteada), `soloBorde`, `radioSegun` (tamaño del punto según un campo), `colorSegun` y `colores` (color fijo por valor de un campo, como cada línea de colectivo). |
+| `ordenMapa` | Opcional. Controla qué capa se dibuja encima: menor número, más arriba. Por defecto vale el orden de la lista. |
 | `campos` | Campos que muestra la ficha, con su nombre visible: `{"campo": "Nombre visible"}`. Si falta, muestra todos. |
 | `variables` | Lista de variables para explorar (ver abajo). |
 | `clasificacion` | `cuantiles` (por defecto) o `intervalos`. |
@@ -95,6 +102,9 @@ Cada variable admite:
 | `paleta` | `divergente` para variaciones: los cortes quedan simétricos alrededor de cero. |
 | `invertir` | `true` invierte los colores (por ejemplo, para que una baja del NBI se vea en verde azulado). |
 | `limites` | `[mínimo, máximo]` del histograma y el filtro, para que unos pocos valores extremos no aplasten el gráfico. |
+| `cortes` | Cortes de clase fijos, por ejemplo `[10, 25, 50]`. Útil cuando muchos valores son cero y los cuantiles no sirven. |
+| `clasificacion`, `clases` | Igual que a nivel de capa, pero solo para esa variable. |
+| `colores` | Para variables de categoría: color fijo por valor, por ejemplo `{"Alto": "#9A4A2B"}`. |
 
 A nivel general, `explorarInicial` define qué capa y variable se muestran al abrir el sitio, y en `estilo` la opción `"soloBorde": true` dibuja solo el contorno (útil para límites que van por encima de otras capas, porque no tapan los clics).
 
@@ -111,6 +121,8 @@ python -m http.server 8000
 y abrir `http://localhost:8000`.
 
 ## Datos incluidos
+
+- `barrios_populares.geojson`: los 67 barrios populares de Tigre del Registro Nacional de Barrios Populares (RENABAP, base 2023 con 6.467 barrios en el país). Además de los campos originales, trae categorías resumidas de luz, agua y cloaca y la cantidad de esos servicios que llegan por red. En `radios_censales.geojson`, `renabap_pct` es la parte de cada radio ocupada por barrios populares y `renabap_fam` reparte las familias de cada barrio según la superficie compartida.
 
 - `oferta_inmobiliaria_2026_09.geojson`: puntos de oferta en venta (casas y departamentos) del Monitor del Mercado Inmobiliario de Tigre, Edición N°2, corte 1/9/2026. Cada punto trae la mediana de USD/m² y la cantidad de avisos en esa coordenada. Se descartaron los puntos fuera del partido. Los puntos con 10 avisos o más se marcan como coordenadas compartidas.
 - En `radios_censales.geojson`, los campos `oferta_usd_m2` y `oferta_avisos` resumen esos avisos por radio (mediana ponderada, mínimo 5 avisos, sin coordenadas compartidas).
