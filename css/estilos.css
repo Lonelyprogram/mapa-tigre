@@ -218,6 +218,13 @@ select {
 .conteo { margin: 8px 0 0; font-size: .85rem; }
 .conteo button { margin-left: 6px; padding: 2px 8px; font-size: .8rem; }
 
+.leaflet-tooltip.etiqueta {
+  background: none; border: 0; box-shadow: none; padding: 0;
+  font-size: .82rem; font-weight: 700; color: var(--tinta);
+  text-shadow: 0 0 3px var(--papel), 0 0 6px var(--papel), 0 0 9px var(--papel);
+  white-space: nowrap; pointer-events: none;
+}
+.leaflet-tooltip.etiqueta::before { display: none; }
 .flecha svg { width: 18px; height: 18px; display: block; opacity: .9; }
 
 /* Mapa */

@@ -336,7 +336,8 @@
         onEachFeature: (f, l) => {
           l.on("click", (e) => { L.DomEvent.stopPropagation(e); seleccionar(def.id, l); });
           const t = tituloDe(def, f);
-          if (t) l.bindTooltip(escapar(t), { sticky: true, direction: "top", opacity: 0.95 });
+          if (t && def.etiquetaFija) l.bindTooltip(escapar(t), { permanent: true, direction: "center", className: "etiqueta", opacity: 1 });
+          else if (t) l.bindTooltip(escapar(t), { sticky: true, direction: "top", opacity: 0.95 });
         }
       });
     }
@@ -369,7 +370,8 @@
         onEachFeature: (f, l) => {
           l.on("click", (e) => { L.DomEvent.stopPropagation(e); seleccionar(def.id, l); });
           const t = tituloDe(def, f);
-          if (t) l.bindTooltip(escapar(t), { sticky: true, direction: "top", opacity: 0.95 });
+          if (t && def.etiquetaFija) l.bindTooltip(escapar(t), { permanent: true, direction: "center", className: "etiqueta", opacity: 1 });
+          else if (t) l.bindTooltip(escapar(t), { sticky: true, direction: "top", opacity: 0.95 });
         }
       });
       registro.cargada = true;
