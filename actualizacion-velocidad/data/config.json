@@ -1,0 +1,970 @@
+{
+  "titulo": "Geoportal de Tigre",
+  "subtitulo": "Datos abiertos del partido de Tigre · IDEAR Tigre",
+  "vista": {
+    "centro": [-34.4, -58.6],
+    "zoom": 11
+  },
+  "limitesNavegacion": [[-34.85, -59.1], [-33.7, -58.05]],
+  "mapasBase": [
+    {
+      "nombre": "Argenmap gris",
+      "url": "https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/mapabase_gris@EPSG%3A3857@png/{z}/{x}/{-y}.png",
+      "atribucion": "<a href=\"https://www.ign.gob.ar/AreaServicios/Argenmap/Introduccion\" target=\"_blank\">Instituto Geográfico Nacional</a> + <a href=\"https://www.osm.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
+      "zoomMaximo": 18,
+      "inicial": true
+    },
+    {
+      "nombre": "Argenmap",
+      "url": "https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/capabaseargenmap@EPSG%3A3857@png/{z}/{x}/{-y}.png",
+      "atribucion": "<a href=\"https://www.ign.gob.ar/AreaServicios/Argenmap/Introduccion\" target=\"_blank\">Instituto Geográfico Nacional</a> + <a href=\"https://www.osm.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
+      "zoomMaximo": 18
+    },
+    {
+      "nombre": "OpenStreetMap",
+      "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "atribucion": "&copy; <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
+      "zoomMaximo": 19
+    },
+    {
+      "nombre": "Satelital",
+      "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      "atribucion": "Imágenes &copy; Esri",
+      "zoomMaximo": 18
+    }
+  ],
+  "capas": [
+    {
+      "id": "limite",
+      "nombre": "Límite de Tigre",
+      "grupo": "Desarrollo urbano",
+      "archivo": "data/tigre_limite.geojson",
+      "geometria": "poligono",
+      "visible": true,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "ARBA, Gerencia de Servicios Catastrales, vía IGN",
+      "estilo": {
+        "color": "#9A6B2F",
+        "grosor": 2.5,
+        "soloBorde": true
+      },
+      "campos": {
+        "nombre": "Partido",
+        "cabecera": "Ciudad cabecera",
+        "sup_km2": "Superficie (km²)",
+        "perim_km": "Perímetro (km)",
+        "fuente": "Fuente"
+      }
+    },
+    {
+      "id": "localidades",
+      "nombre": "Localidades",
+      "grupo": "Desarrollo urbano",
+      "archivo": "data/localidades.geojson",
+      "geometria": "punto",
+      "visible": true,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "INDEC, Base de Asentamientos Humanos (ubicación de referencia de cada localidad).",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#1C2B2F",
+        "radio": 5,
+        "grosor": 1.5
+      },
+      "campos": {
+        "nombre": "Localidad",
+        "codigo": "Código INDEC"
+      }
+    },
+    {
+      "id": "parcelas",
+      "nombre": "Parcelario (ARBA)",
+      "grupo": "Desarrollo urbano",
+      "tipo": "teselas",
+      "plantilla": "data/parcelas/{z}/{x}/{y}.geojson",
+      "zoomTeselas": 14,
+      "zoomMinimo": 16,
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "partida",
+      "ordenMapa": 70,
+      "fuente": "ARBA, parcelario del partido de Tigre (110.101). Son 103.806 parcelas: el mapa las carga por zonas a medida que te acercás.",
+      "estilo": {
+        "color": "#8A7A63",
+        "relleno": "#C9BCA3",
+        "opacidadRelleno": 0.25,
+        "grosor": 0.5
+      },
+      "campos": {
+        "partida": "Partida",
+        "cca": "Nomenclatura catastral",
+        "tipo": "Tipo",
+        "sup_m2": "Superficie (m²)"
+      }
+    },
+    {
+      "id": "manzanas",
+      "nombre": "Manzanas",
+      "grupo": "Desarrollo urbano",
+      "archivo": "data/manzanas.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "cca",
+      "ordenMapa": 75,
+      "fuente": "ARBA, manzanas del parcelario del partido de Tigre.",
+      "estilo": {
+        "color": "#8A7A63",
+        "grosor": 0.8,
+        "soloBorde": true
+      },
+      "campos": {
+        "cca": "Nomenclatura catastral",
+        "sup_m2": "Superficie (m²)",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "sup_m2",
+          "nombre": "Superficie de la manzana",
+          "unidad": "m²",
+          "decimales": 0
+        }
+      ],
+      "soloAlPrender": true
+    },
+    {
+      "id": "barrios_populares",
+      "nombre": "Barrios populares (RENABAP)",
+      "grupo": "Desarrollo urbano",
+      "archivo": "data/barrios_populares.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Registro Nacional de Barrios Populares (RENABAP), Subsecretaría de Integración Socio Urbana. Versión del registro con 6.467 barrios en todo el país (base 2023). Familias y viviendas son estimaciones del propio registro; los servicios describen el modo en que accede la mayoría del barrio.",
+      "estilo": {
+        "color": "#7A2E22",
+        "relleno": "#B5566B",
+        "opacidadRelleno": 0.45,
+        "grosor": 1.2
+      },
+      "campos": {
+        "servicios_txt": "Servicios por red",
+        "nombre_barrio": "Barrio",
+        "localidad": "Localidad",
+        "id_renabap": "ID RENABAP",
+        "tipo": "Tipo",
+        "decada": "Década de origen",
+        "familias": "Familias (estimado)",
+        "viviendas": "Viviendas (estimado)",
+        "sup_ha": "Superficie (ha)",
+        "energia_electrica": "Energía eléctrica",
+        "agua_corriente": "Agua",
+        "efluentes_cloacales": "Desagüe cloacal",
+        "cocina": "Cocina",
+        "calefaccion": "Calefacción",
+        "titulo_propiedad": "Título de propiedad"
+      },
+      "clasificacion": "cuantiles",
+      "clases": 5,
+      "variables": [
+        {
+          "campo": "servicios_txt",
+          "grupo": "Servicios",
+          "nombre": "Servicios conectados a la red",
+          "tipo": "categoria",
+          "colores": {
+            "0 de 3 servicios": "#9A4A2B",
+            "1 de 3 servicios": "#D6A184",
+            "2 de 3 servicios": "#8DB8A9",
+            "3 de 3 servicios": "#16525A"
+          },
+          "descripcion": "Cuántos de estos tres servicios llegan por red en la mayoría del barrio: luz (formal o regular), agua (formal o regular) y cloaca."
+        },
+        {
+          "campo": "energia",
+          "nombre": "Energía eléctrica",
+          "tipo": "categoria",
+          "grupo": "Servicios"
+        },
+        {
+          "campo": "agua",
+          "nombre": "Agua",
+          "tipo": "categoria",
+          "grupo": "Servicios"
+        },
+        {
+          "campo": "cloaca",
+          "nombre": "Desagüe cloacal",
+          "tipo": "categoria",
+          "grupo": "Servicios"
+        },
+        {
+          "campo": "familias",
+          "grupo": "Tamaño",
+          "nombre": "Familias",
+          "decimales": 0
+        },
+        {
+          "campo": "dens_viv_ha",
+          "grupo": "Tamaño",
+          "nombre": "Densidad de viviendas",
+          "unidad": "viv./ha",
+          "decimales": 0
+        },
+        {
+          "campo": "sup_ha",
+          "grupo": "Tamaño",
+          "nombre": "Superficie",
+          "unidad": "ha",
+          "decimales": 1
+        },
+        {
+          "campo": "tipo",
+          "nombre": "Tipo de barrio",
+          "tipo": "categoria",
+          "descripcion": "El RENABAP distingue villas (trama irregular y alta densidad) de asentamientos (trama más regular, en general loteos informales).",
+          "grupo": "Origen y tipo"
+        },
+        {
+          "campo": "decada",
+          "nombre": "Década de origen",
+          "tipo": "categoria",
+          "grupo": "Origen y tipo"
+        }
+      ]
+    },
+    {
+      "id": "region",
+      "nombre": "Municipios limítrofes",
+      "grupo": "Desarrollo urbano",
+      "archivo": "data/region_partidos.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "partido",
+      "busqueda": "partido",
+      "fuente": "IGN, SIG250. Superficie, perímetro y compacidad calculados en POSGAR 2007 faja 5.",
+      "estilo": {
+        "color": "#4E6F73",
+        "relleno": "#8DB8A9",
+        "opacidadRelleno": 0.15,
+        "grosor": 1.2
+      },
+      "campos": {
+        "partido": "Partido",
+        "cabecera": "Ciudad cabecera",
+        "sup_km2": "Superficie (km²)",
+        "perim_km": "Perímetro (km)",
+        "compacidad": "Compacidad"
+      },
+      "clasificacion": "cuantiles",
+      "clases": 5,
+      "variables": [
+        {
+          "campo": "sup_km2",
+          "nombre": "Superficie",
+          "unidad": "km²",
+          "decimales": 1,
+          "descripcion": "Superficie total del partido, incluidas las islas del Delta."
+        },
+        {
+          "campo": "perim_km",
+          "nombre": "Perímetro",
+          "unidad": "km",
+          "decimales": 1
+        },
+        {
+          "campo": "compacidad",
+          "nombre": "Compacidad",
+          "decimales": 2,
+          "descripcion": "Índice de Polsby-Popper: 1 es un círculo perfecto; los valores bajos indican formas alargadas o recortadas."
+        },
+        {
+          "campo": "es_tigre",
+          "nombre": "Tigre y vecinos",
+          "tipo": "categoria"
+        }
+      ],
+      "ordenMapa": 95
+    },
+    {
+      "id": "educacion",
+      "nombre": "Establecimientos educativos",
+      "grupo": "Desarrollo humano",
+      "archivo": "data/educacion.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "IGN, sobre el Mapa Educativo Nacional.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#2F6FB0",
+        "radio": 5,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "nivel": "Nivel",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "nivel",
+          "nombre": "Nivel educativo",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "salud",
+      "nombre": "Centros de salud",
+      "grupo": "Desarrollo humano",
+      "archivo": "data/salud.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "IGN, sobre el Registro Federal de Establecimientos de Salud (SISA).",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#C0392B",
+        "radio": 7,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "categoria": "Categoría",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "categoria",
+          "nombre": "Tipo de centro",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "cultura",
+      "nombre": "Instituciones culturales",
+      "grupo": "Desarrollo humano",
+      "archivo": "data/cultura.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#8E44AD",
+        "radio": 7,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "categoria",
+          "nombre": "Tipo de institución",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "deporte",
+      "nombre": "Clubes y polideportivos",
+      "grupo": "Desarrollo humano",
+      "archivo": "data/deporte.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#27AE60",
+        "radio": 7,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "tipo",
+          "nombre": "Tipo",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "culto",
+      "nombre": "Instituciones religiosas",
+      "grupo": "Desarrollo humano",
+      "archivo": "data/culto.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "IGN, sobre el Registro Nacional de Cultos y datos arquidiocesanos.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#7D6B91",
+        "radio": 5,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Denominación",
+        "culto": "Culto",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "culto",
+          "nombre": "Culto",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "seguridad",
+      "nombre": "Seguridad",
+      "grupo": "Seguridad",
+      "archivo": "data/seguridad.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#34495E",
+        "radio": 7,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "tipo",
+          "nombre": "Tipo de dependencia",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "bomberos",
+      "nombre": "Bomberos",
+      "grupo": "Seguridad",
+      "archivo": "data/bomberos.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#E67E22",
+        "radio": 8,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "fuente": "Fuente"
+      }
+    },
+    {
+      "id": "estaciones_tren",
+      "nombre": "Estaciones de tren",
+      "grupo": "Movilidad",
+      "archivo": "data/estaciones_tren.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#1C2B2F",
+        "relleno": "#FFFFFF",
+        "radio": 7,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Estación",
+        "operador": "Operador"
+      }
+    },
+    {
+      "id": "ferrocarril",
+      "nombre": "Líneas de tren",
+      "grupo": "Movilidad",
+      "archivo": "data/ferrocarril.geojson",
+      "geometria": "linea",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#1C2B2F",
+        "grosor": 3,
+        "guiones": "8 5"
+      },
+      "campos": {
+        "nombre": "Línea",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "linea",
+          "nombre": "Línea",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "colectivos",
+      "nombre": "Líneas de colectivo",
+      "grupo": "Movilidad",
+      "archivo": "data/colectivos.geojson",
+      "geometria": "linea",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Recorridos de líneas nacionales, provinciales y municipales que pasan por Tigre. Cada línea reúne todos sus ramales y sentidos.",
+      "estilo": {
+        "color": "#5B6FA8",
+        "grosor": 2.2,
+        "opacidad": 0.85,
+        "colorSegun": "linea"
+      },
+      "campos": {
+        "linea": "Línea",
+        "ramales": "Ramales",
+        "jurisdiccion": "Jurisdicción"
+      },
+      "variables": [
+        {
+          "campo": "linea",
+          "nombre": "Línea",
+          "tipo": "categoria",
+          "descripcion": "Cada línea tiene su color. Usá «Ocultar todas» y marcá las que quieras ver."
+        },
+        {
+          "campo": "jurisdiccion",
+          "nombre": "Jurisdicción",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "rutas",
+      "nombre": "Rutas nacionales y provinciales",
+      "grupo": "Movilidad",
+      "archivo": "data/rutas.geojson",
+      "geometria": "linea",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "IGN, sobre Vialidad Nacional y la Dirección de Vialidad de la Provincia de Buenos Aires.",
+      "estilo": {
+        "color": "#D98C3A",
+        "grosor": 3.5
+      },
+      "campos": {
+        "nombre": "Ruta",
+        "jurisdiccion": "Jurisdicción",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "jurisdiccion",
+          "nombre": "Jurisdicción",
+          "tipo": "categoria"
+        },
+        {
+          "campo": "nombre",
+          "nombre": "Ruta",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "espacios_verdes",
+      "nombre": "Plazas y espacios verdes",
+      "grupo": "Espacio público",
+      "archivo": "data/espacios_verdes.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#4E7A2E",
+        "relleno": "#6F8A3E",
+        "opacidadRelleno": 0.55,
+        "grosor": 1
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "sup_m2": "Superficie (m²)",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "sup_m2",
+          "nombre": "Superficie",
+          "unidad": "m²",
+          "decimales": 0
+        },
+        {
+          "campo": "tipo",
+          "nombre": "Tipo",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "industrias",
+      "nombre": "Parques industriales y logísticos",
+      "grupo": "Espacio público",
+      "archivo": "data/areas_industriales.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#6B5530",
+        "relleno": "#8A6D3B",
+        "opacidadRelleno": 0.4,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "sup_ha": "Superficie (ha)",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "tipo",
+          "nombre": "Tipo",
+          "tipo": "categoria"
+        },
+        {
+          "campo": "sup_ha",
+          "nombre": "Superficie",
+          "unidad": "ha",
+          "decimales": 1
+        }
+      ]
+    },
+    {
+      "id": "estaciones_servicio",
+      "nombre": "Estaciones de servicio",
+      "grupo": "Espacio público",
+      "archivo": "data/estaciones_servicio.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "IGN, sobre datos de la Secretaría de Energía.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#B8860B",
+        "radio": 5,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "bandera": "Bandera",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "bandera",
+          "nombre": "Bandera",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "reciclaje",
+      "nombre": "Gestión de residuos",
+      "grupo": "Espacio público",
+      "archivo": "data/reciclaje.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "estilo": {
+        "color": "#2F6B45",
+        "relleno": "#3E8E5A",
+        "opacidadRelleno": 0.4,
+        "grosor": 1.4,
+        "radio": 7
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "sup_ha": "Superficie (ha)",
+        "en_tigre": "Dentro de Tigre",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "tipo",
+          "nombre": "Tipo",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "valor_suelo",
+      "nombre": "Valor del suelo (sep. 2026)",
+      "grupo": "Espacio público",
+      "archivo": "data/valor_suelo.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "nombre",
+      "fuente": "Elaboración propia sobre el Monitor del Mercado Inmobiliario de Tigre, Edición N°2 (corte 1/9/2026), con avisos de venta de casas y departamentos de ZonaProp, Argenprop y MercadoLibre. Es precio de oferta publicada, no de cierre, en dólares al MEP. Cada celda mide 500 m de lado a lado y resume al menos 5 avisos; se descartaron las coordenadas genéricas que los portales asignan a barrios enteros.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#8DB8A9",
+        "opacidadRelleno": 0.8,
+        "grosor": 0.4,
+        "colorearPor": "usd_m2"
+      },
+      "campos": {
+        "usd_m2": "Valor mediano (USD/m²)",
+        "rango": "Rango habitual (USD/m²)",
+        "avisos": "Avisos en la celda",
+        "puntos": "Ubicaciones distintas",
+        "dif_partido": "Diferencia con la mediana del partido"
+      },
+      "clasificacion": "cuantiles",
+      "clases": 5,
+      "variables": [
+        {
+          "campo": "usd_m2",
+          "nombre": "Valor mediano por m²",
+          "unidad": "USD/m²",
+          "decimales": 0,
+          "descripcion": "Mediana de los avisos de la celda, ponderada por cantidad de avisos. En departamentos el precio se divide por superficie total y en casas por superficie cubierta."
+        },
+        {
+          "campo": "dif_partido",
+          "nombre": "Diferencia con la mediana del partido",
+          "unidad": "%",
+          "decimales": 0,
+          "paleta": "divergente",
+          "descripcion": "Cuánto se aparta la celda de la mediana de Tigre, que es 2.042 USD/m²."
+        },
+        {
+          "campo": "avisos",
+          "nombre": "Cantidad de avisos",
+          "decimales": 0,
+          "limites": [5, 60],
+          "descripcion": "Cuántos avisos respaldan el valor de la celda. Las celdas con pocos avisos son menos confiables."
+        }
+      ]
+    },
+    {
+      "id": "radios",
+      "nombre": "Radios censales",
+      "grupo": "Censos",
+      "archivo": "data/radios_censales.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "radio",
+      "busqueda": "radio",
+      "fuente": "INDEC, Censos 2001 y 2022 (vía Source.Coop, nlebovits/censo-argentino). Radios: Rodríguez y de Grande, CONICET. Los valores de 2001 se estimaron sobre los radios de 2022 por interpolación de áreas. El precio de oferta sale del Monitor del Mercado Inmobiliario de Tigre, ed. N°2 (septiembre 2026). Los barrios populares provienen del RENABAP (base 2023).",
+      "estilo": {
+        "color": "#4E6F73",
+        "relleno": "#8DB8A9",
+        "opacidadRelleno": 0.08,
+        "grosor": 0.5
+      },
+      "campos": {
+        "codigo": "Código INDEC",
+        "pob_2022": "Población 2022",
+        "hog_2022": "Hogares 2022",
+        "area_km2": "Superficie (km²)"
+      },
+      "clasificacion": "cuantiles",
+      "clases": 5,
+      "variables": [
+        {
+          "id": "pob",
+          "grupo": "Población",
+          "nombre": "Población",
+          "series": {"2001": "pob_2001", "2022": "pob_2022"},
+          "unidad": "hab.",
+          "decimales": 0,
+          "descripcion": "Personas por radio. Los valores de 2001 son estimaciones sobre los radios de 2022."
+        },
+        {
+          "id": "dens",
+          "grupo": "Población",
+          "nombre": "Densidad",
+          "series": {"2001": "dens_2001", "2022": "dens_2022"},
+          "unidad": "hab./km²",
+          "decimales": 0
+        },
+        {
+          "campo": "var_pob",
+          "grupo": "Población",
+          "nombre": "Variación de población 2001-2022",
+          "unidad": "%",
+          "decimales": 0,
+          "paleta": "divergente",
+          "limites": [-60, 300],
+          "descripcion": "Cambio porcentual de la población entre censos. Los radios que casi no tenían habitantes en 2001 muestran aumentos muy grandes."
+        },
+        {
+          "id": "m14",
+          "grupo": "Población",
+          "nombre": "Población de 0 a 14 años",
+          "series": {"2001": "m14_2001", "2022": "m14_2022"},
+          "unidad": "%",
+          "decimales": 1
+        },
+        {
+          "id": "m65",
+          "grupo": "Población",
+          "nombre": "Población de 65 años y más",
+          "series": {"2001": "m65_2001", "2022": "m65_2022"},
+          "unidad": "%",
+          "decimales": 1
+        },
+        {
+          "id": "nbi",
+          "grupo": "Condiciones de vida",
+          "nombre": "Hogares con NBI",
+          "series": {"2001": "nbi_2001", "2022": "nbi_2022"},
+          "unidad": "%",
+          "decimales": 1,
+          "descripcion": "Hogares con al menos una necesidad básica insatisfecha."
+        },
+        {
+          "campo": "dif_nbi",
+          "grupo": "Condiciones de vida",
+          "nombre": "Cambio en hogares con NBI 2001-2022",
+          "unidad": "p. p.",
+          "decimales": 1,
+          "paleta": "divergente",
+          "invertir": true,
+          "descripcion": "Diferencia en puntos porcentuales. En verde azulado, los radios donde bajó la proporción de hogares con NBI."
+        },
+        {
+          "campo": "sincob_2022",
+          "grupo": "Condiciones de vida",
+          "nombre": "Sin cobertura de salud (2022)",
+          "unidad": "%",
+          "decimales": 1,
+          "descripcion": "Personas sin obra social, prepaga ni plan estatal de salud."
+        },
+        {
+          "id": "cloaca",
+          "grupo": "Servicios",
+          "nombre": "Hogares con desagüe a cloaca",
+          "series": {"2001": "cloaca_2001", "2022": "cloaca_2022"},
+          "unidad": "%",
+          "decimales": 1
+        },
+        {
+          "campo": "dif_cloaca",
+          "grupo": "Servicios",
+          "nombre": "Cambio en desagüe a cloaca 2001-2022",
+          "unidad": "p. p.",
+          "decimales": 1,
+          "paleta": "divergente",
+          "descripcion": "Diferencia en puntos porcentuales. En verde azulado, los radios donde creció la conexión a cloaca."
+        },
+        {
+          "campo": "agua_2022",
+          "grupo": "Servicios",
+          "nombre": "Hogares con agua de red (2022)",
+          "unidad": "%",
+          "decimales": 1
+        },
+        {
+          "campo": "sec_2022",
+          "grupo": "Educación y conectividad",
+          "nombre": "Secundario completo o más (2022)",
+          "unidad": "%",
+          "decimales": 1,
+          "descripcion": "Sobre toda la población con dato, incluidos niños y niñas: sirve para comparar radios, pero da valores más bajos que las cifras oficiales para mayores de 25 años."
+        },
+        {
+          "id": "pc",
+          "grupo": "Educación y conectividad",
+          "nombre": "Hogares con computadora",
+          "series": {"2001": "pc_2001", "2022": "pc_2022"},
+          "unidad": "%",
+          "decimales": 1,
+          "descripcion": "En 2001 cuenta PC con o sin internet; en 2022, computadora o tablet. La comparación es aproximada."
+        },
+        {
+          "campo": "dif_pc",
+          "grupo": "Educación y conectividad",
+          "nombre": "Cambio en hogares con computadora 2001-2022",
+          "unidad": "p. p.",
+          "decimales": 1,
+          "paleta": "divergente"
+        },
+        {
+          "campo": "oferta_usd_m2",
+          "grupo": "Mercado inmobiliario",
+          "nombre": "Precio de oferta por m² (sep. 2026)",
+          "unidad": "USD/m²",
+          "decimales": 0,
+          "descripcion": "Mediana ponderada de los avisos del Monitor Inmobiliario (ed. N°2) que caen en cada radio. Solo radios con 5 avisos o más y sin contar coordenadas compartidas por 10 avisos o más. Es precio de oferta, no de cierre."
+        },
+        {
+          "campo": "oferta_avisos",
+          "grupo": "Mercado inmobiliario",
+          "nombre": "Avisos en venta (sep. 2026)",
+          "decimales": 0,
+          "limites": [5, 80]
+        },
+        {
+          "campo": "renabap_pct",
+          "grupo": "Barrios populares",
+          "nombre": "Superficie en barrios populares",
+          "unidad": "%",
+          "decimales": 1,
+          "limites": [0, 100],
+          "descripcion": "Parte de la superficie del radio que ocupan barrios del RENABAP.",
+          "cortes": [0.1, 10, 25, 50]
+        },
+        {
+          "campo": "renabap_fam",
+          "grupo": "Barrios populares",
+          "nombre": "Familias en barrios populares",
+          "decimales": 0,
+          "descripcion": "Estimación: las familias de cada barrio se reparten entre los radios según la superficie que comparten.",
+          "cortes": [0.5, 50, 150, 400]
+        }
+      ],
+      "ordenMapa": 90
+    }
+  ]
+}
