@@ -8,23 +8,23 @@
   "limitesNavegacion": [[-34.85, -59.1], [-33.7, -58.05]],
   "mapasBase": [
     {
+      "nombre": "OpenStreetMap",
+      "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "atribucion": "&copy; <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
+      "zoomMaximo": 19,
+      "inicial": true
+    },
+    {
       "nombre": "Argenmap gris",
       "url": "https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/mapabase_gris@EPSG%3A3857@png/{z}/{x}/{-y}.png",
       "atribucion": "<a href=\"https://www.ign.gob.ar/AreaServicios/Argenmap/Introduccion\" target=\"_blank\">Instituto Geográfico Nacional</a> + <a href=\"https://www.osm.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
-      "zoomMaximo": 18,
-      "inicial": true
+      "zoomMaximo": 18
     },
     {
       "nombre": "Argenmap",
       "url": "https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/capabaseargenmap@EPSG%3A3857@png/{z}/{x}/{-y}.png",
       "atribucion": "<a href=\"https://www.ign.gob.ar/AreaServicios/Argenmap/Introduccion\" target=\"_blank\">Instituto Geográfico Nacional</a> + <a href=\"https://www.osm.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
       "zoomMaximo": 18
-    },
-    {
-      "nombre": "OpenStreetMap",
-      "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-      "atribucion": "&copy; <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
-      "zoomMaximo": 19
     },
     {
       "nombre": "Satelital",
@@ -62,21 +62,105 @@
       "nombre": "Localidades",
       "grupo": "Desarrollo urbano",
       "archivo": "data/localidades.geojson",
-      "geometria": "punto",
+      "geometria": "poligono",
       "visible": true,
       "titulo": "nombre",
       "busqueda": "nombre",
-      "fuente": "INDEC, Base de Asentamientos Humanos (ubicación de referencia de cada localidad).",
+      "fuente": "Polígonos y superficie: INDEC, localidades 2022. Población y demás indicadores: sumatoria de los radios censales cuyo centro cae en cada localidad, con los censos 2001 y 2022. «Islas del Delta» es el resto del partido, fuera de las localidades del continente.",
       "estilo": {
-        "color": "#FFFFFF",
-        "relleno": "#1C2B2F",
-        "radio": 5,
-        "grosor": 1.5
+        "color": "#4E6F73",
+        "relleno": "#8DB8A9",
+        "opacidadRelleno": 0.1,
+        "grosor": 1.4
       },
       "campos": {
         "nombre": "Localidad",
-        "codigo": "Código INDEC"
-      }
+        "codigo": "Código INDEC 2022",
+        "sup_km2": "Superficie (km²)",
+        "radios": "Radios censales",
+        "pob_2022": "Población 2022",
+        "pob_2001": "Población 2001",
+        "hog_2022": "Hogares 2022",
+        "nbi_2022": "Hogares con NBI (%)",
+        "cloaca_2022": "Hogares con cloaca (%)",
+        "sec_2022": "Secundario completo o más (%)",
+        "sincob_2022": "Sin cobertura de salud (%)",
+        "renabap_fam": "Familias en barrios populares"
+      },
+      "variables": [
+        {
+          "id": "pob",
+          "grupo": "Población",
+          "nombre": "Población",
+          "series": {"2001": "pob_2001", "2022": "pob_2022"},
+          "unidad": "hab.",
+          "decimales": 0
+        },
+        {
+          "id": "dens",
+          "grupo": "Población",
+          "nombre": "Densidad",
+          "series": {"2001": "dens_2001", "2022": "dens_2022"},
+          "unidad": "hab./km²",
+          "decimales": 0
+        },
+        {
+          "campo": "var_pob",
+          "grupo": "Población",
+          "nombre": "Variación de población 2001-2022",
+          "unidad": "%",
+          "decimales": 0,
+          "paleta": "divergente",
+          "limites": [-20, 300],
+          "descripcion": "Nordelta y Dique Luján multiplicaron su población desde 2001, así que sus valores se salen de la escala."
+        },
+        {
+          "campo": "sup_km2",
+          "grupo": "Población",
+          "nombre": "Superficie",
+          "unidad": "km²",
+          "decimales": 1
+        },
+        {
+          "campo": "nbi_2022",
+          "grupo": "Condiciones de vida",
+          "nombre": "Hogares con NBI (2022)",
+          "unidad": "%",
+          "decimales": 1
+        },
+        {
+          "campo": "cloaca_2022",
+          "grupo": "Servicios",
+          "nombre": "Hogares con cloaca (2022)",
+          "unidad": "%",
+          "decimales": 1
+        },
+        {
+          "campo": "sec_2022",
+          "grupo": "Educación",
+          "nombre": "Secundario completo o más (2022)",
+          "unidad": "%",
+          "decimales": 1
+        },
+        {
+          "campo": "sincob_2022",
+          "grupo": "Condiciones de vida",
+          "nombre": "Sin cobertura de salud (2022)",
+          "unidad": "%",
+          "decimales": 1
+        },
+        {
+          "campo": "renabap_fam",
+          "grupo": "Condiciones de vida",
+          "nombre": "Familias en barrios populares",
+          "decimales": 0
+        }
+      ],
+      "etiquetaFija": true,
+      "ordenMapa": 85,
+      "soloAlPrender": false,
+      "clasificacion": "cuantiles",
+      "clases": 5
     },
     {
       "id": "parcelas",
@@ -535,6 +619,80 @@
           "tipo": "categoria"
         }
       ]
+    },
+    {
+      "id": "calles",
+      "nombre": "Calles",
+      "grupo": "Movilidad",
+      "archivo": "data/calles.geojson",
+      "geometria": "linea",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "soloAlPrender": true,
+      "ordenMapa": 60,
+      "fuente": "OpenStreetMap, colaboradores. Recortado al partido de Tigre. El sentido de circulación proviene del campo oneway de OSM y puede estar desactualizado en calles de barrio.",
+      "estilo": {
+        "color": "#7A8B95",
+        "grosor": 1.6,
+        "opacidad": 0.9,
+        "colorSegun": "sentido",
+        "colores": {
+          "Doble mano": "#7A8B95",
+          "Mano única": "#C2622C"
+        }
+      },
+      "campos": {
+        "nombre": "Calle",
+        "tipo": "Tipo",
+        "sentido": "Sentido",
+        "largo_km": "Largo (km)",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "sentido",
+          "nombre": "Sentido de circulación",
+          "tipo": "categoria",
+          "colores": {
+            "Doble mano": "#7A8B95",
+            "Mano única": "#C2622C"
+          }
+        },
+        {
+          "campo": "tipo",
+          "nombre": "Tipo de vía",
+          "tipo": "categoria"
+        },
+        {
+          "campo": "largo_km",
+          "nombre": "Largo",
+          "unidad": "km",
+          "decimales": 2
+        }
+      ]
+    },
+    {
+      "id": "sentido",
+      "nombre": "Sentido de circulación",
+      "grupo": "Movilidad",
+      "archivo": "data/sentido_flechas.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "soloAlPrender": true,
+      "zoomMinimo": 16,
+      "soloEnVista": true,
+      "maximoEnVista": 700,
+      "ordenMapa": 58,
+      "titulo": "nombre",
+      "fuente": "Flechas calculadas sobre las calles de mano única de OpenStreetMap: una cada 150 metros, en la dirección permitida.",
+      "estilo": {
+        "flecha": "angulo",
+        "relleno": "#C2622C"
+      },
+      "campos": {
+        "nombre": "Calle"
+      }
     },
     {
       "id": "colectivos",

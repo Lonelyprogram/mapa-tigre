@@ -260,13 +260,32 @@
     mapa.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
 
     const bases = {};
+    const capasBase = [];
     let inicial = null;
     (cfg.mapasBase || []).forEach((b, i) => {
       const t = L.tileLayer(b.url, { attribution: b.atribucion || "", maxZoom: b.zoomMaximo || 19, subdomains: b.subdominios || "abc" });
+      t._nombreBase = b.nombre;
       bases[b.nombre] = t;
+      capasBase.push(t);
       if (b.inicial || (!inicial && i === 0)) inicial = t;
     });
     if (inicial) inicial.addTo(mapa);
+    // si el servidor del mapa base no responde, se pasa solo al siguiente
+    capasBase.forEach((t, i) => {
+      let fallas = 0, anduvo = false;
+      t.on("tileload", () => { anduvo = true; });
+      t.on("tileerror", () => {
+        fallas++;
+        // se busca un mapa base de otro servidor, no otro del mismo que falló
+        const host = (u) => { try { return new URL(u.replace("{s}", "a")).host; } catch (e) { return u; } };
+        const suplente = capasBase.find((o, j) => j !== i && host(o._url) !== host(t._url)) || capasBase[i + 1] || capasBase[0];
+        if (anduvo || fallas < 6 || !mapa.hasLayer(t) || suplente === t) return;
+        mapa.removeLayer(t);
+        suplente.addTo(mapa);
+        avisar(`El mapa base ${t._nombreBase} no está respondiendo. Se cambió a ${suplente._nombreBase}; podés elegir otro con el botón de capas, arriba a la izquierda.`);
+        setTimeout(() => { if ($("aviso").textContent.startsWith("El mapa base")) avisar(""); }, 12000);
+      });
+    });
     if (Object.keys(bases).length > 1) L.control.layers(bases, null, { position: "topleft" }).addTo(mapa);
 
     mapa.createPane("poligonos").style.zIndex = 410;
@@ -277,7 +296,25 @@
     mapa.on("click", () => cerrarFicha());
     mapa.on("moveend", guardarEnUrl);
     mapa.on("moveend zoomend", actualizarTeselas);
+    mapa.on("moveend zoomend", ajustarPorZoom);
     return mapa;
+  }
+
+  // Marcador de flecha girada: se usa para el sentido de circulación
+  function flechaDe(def, feature, ll) {
+    const ang = Number(feature.properties[def.estilo.flecha]) || 0;
+    const color = def.estilo.relleno || "#16525A";
+    return L.marker(ll, {
+      pane: "puntos",
+      interactive: false,
+      keyboard: false,
+      icon: L.divIcon({
+        className: "flecha",
+        iconSize: [18, 18],
+        html: `<svg viewBox="0 0 24 24" style="transform:rotate(${ang}deg)" aria-hidden="true">
+          <path d="M12 2 L18 20 L12 16 L6 20 Z" fill="${color}"/></svg>`
+      })
+    });
   }
 
   function paneDe(def) {
@@ -299,7 +336,8 @@
         onEachFeature: (f, l) => {
           l.on("click", (e) => { L.DomEvent.stopPropagation(e); seleccionar(def.id, l); });
           const t = tituloDe(def, f);
-          if (t) l.bindTooltip(escapar(t), { sticky: true, direction: "top", opacity: 0.95 });
+          if (t && def.etiquetaFija) l.bindTooltip(escapar(t), { permanent: true, direction: "center", className: "etiqueta", opacity: 1 });
+          else if (t) l.bindTooltip(escapar(t), { sticky: true, direction: "top", opacity: 0.95 });
         }
       });
     }
@@ -326,11 +364,14 @@
       registro.capa = L.geoJSON(registro.datos, {
         pane: paneDe(def),
         style: (f) => estiloElemento(def, f),
-        pointToLayer: (f, ll) => L.circleMarker(ll, { ...estiloElemento(def, f), pane: "puntos" }),
+        pointToLayer: (f, ll) => (def.estilo && def.estilo.flecha
+          ? flechaDe(def, f, ll)
+          : L.circleMarker(ll, { ...estiloElemento(def, f), pane: "puntos" })),
         onEachFeature: (f, l) => {
           l.on("click", (e) => { L.DomEvent.stopPropagation(e); seleccionar(def.id, l); });
           const t = tituloDe(def, f);
-          if (t) l.bindTooltip(escapar(t), { sticky: true, direction: "top", opacity: 0.95 });
+          if (t && def.etiquetaFija) l.bindTooltip(escapar(t), { permanent: true, direction: "center", className: "etiqueta", opacity: 1 });
+          else if (t) l.bindTooltip(escapar(t), { sticky: true, direction: "top", opacity: 0.95 });
         }
       });
       registro.cargada = true;
@@ -361,6 +402,34 @@
       const reg = estado.capas.get(def.id);
       if (reg && reg.capa && estado.mapa.hasLayer(reg.capa)) reg.capa.bringToFront();
     });
+  }
+
+  // Capas con zoom mínimo o que solo dibujan lo que entra en pantalla
+  function ajustarPorZoom() {
+    (estado.config.capas || []).forEach((def) => {
+      if (def.tipo === "teselas" || (!def.zoomMinimo && !def.soloEnVista)) return;
+      const reg = estado.capas.get(def.id);
+      const chk = $(`capa-${def.id}`);
+      if (!reg || !reg.capa || !chk) return;
+      const cerca = !def.zoomMinimo || estado.mapa.getZoom() >= def.zoomMinimo;
+      if (chk.checked && cerca) {
+        if (!estado.mapa.hasLayer(reg.capa)) { reg.capa.addTo(estado.mapa); ordenarCapas(); }
+        if (def.soloEnVista) dibujarEnVista(def, reg);
+      } else if (estado.mapa.hasLayer(reg.capa)) {
+        estado.mapa.removeLayer(reg.capa);
+      }
+    });
+  }
+
+  function dibujarEnVista(def, reg) {
+    if (!reg.datos) return;
+    const b = estado.mapa.getBounds();
+    const dentro = reg.datos.features.filter((f) => {
+      const c = f.geometry && f.geometry.coordinates;
+      return c && typeof c[0] === "number" && b.contains([c[1], c[0]]);
+    }).slice(0, def.maximoEnVista || 900);
+    reg.capa.clearLayers();
+    reg.capa.addData({ type: "FeatureCollection", features: dentro });
   }
 
   // ---------- capas en teselas ----------
@@ -446,7 +515,7 @@
         fila.innerHTML = `
           <input type="checkbox" id="${idc}" ${reg.capa && estado.mapa.hasLayer(reg.capa) ? "checked" : ""} ${reg.error ? "disabled" : ""}>
           <span class="muestra ${tipoMuestra}${multicolor ? " multicolor" : ""}" style="${multicolor ? "" : `border-color:${b.color};background:${fondo}`}"></span>
-          <label for="${idc}">${escapar(def.nombre)}${def.tipo === "teselas" ? ` <small>(al acercar)</small>` : ""}</label>
+          <label for="${idc}">${escapar(def.nombre)}${def.tipo === "teselas" || def.zoomMinimo ? ` <small>(al acercar)</small>` : ""}</label>
           ${reg.error ? "" : `<span class="descargas">${def.archivo ? `<a href="${escapar(def.archivo)}" download title="Descargar ${escapar(def.nombre)} como GeoJSON, para usar en QGIS">GeoJSON</a>` : ""}
             <button type="button" class="enlace" data-csv="${escapar(def.id)}" title="${def.tipo === "teselas" ? "Descargar en CSV lo que está cargado en pantalla" : `Descargar la tabla de datos de ${escapar(def.nombre)} en CSV, para abrir en Excel`}">CSV</button></span>`}
           ${reg.error ? `<span class="error">${escapar(reg.error)}</span>` : ""}`;
@@ -495,7 +564,18 @@
       marcarCargando(id, false);
     }
     if (!reg.capa) return;
-    if (visible) { reg.capa.addTo(estado.mapa); ordenarCapas(); if (reg.def.tipo === "teselas") actualizarTeselas(); }
+    if (visible) {
+      const def = reg.def;
+      if (def.zoomMinimo && estado.mapa.getZoom() < def.zoomMinimo) {
+        avisar(`Acercá el mapa para ver la capa ${def.nombre}.`);
+        setTimeout(() => { if ($("aviso").textContent.startsWith("Acercá")) avisar(""); }, 6000);
+      } else {
+        reg.capa.addTo(estado.mapa);
+        ordenarCapas();
+        if (def.soloEnVista) dibujarEnVista(def, reg);
+      }
+      if (def.tipo === "teselas") actualizarTeselas();
+    }
     else {
       estado.mapa.removeLayer(reg.capa);
       if (estado.seleccion && estado.seleccion.id === id) cerrarFicha();
