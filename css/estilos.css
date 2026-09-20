@@ -150,6 +150,10 @@ body {
   background: linear-gradient(90deg, #16525A 0 25%, #C9A46A 25% 50%, #6F8A3E 50% 75%, #B5566B 75% 100%);
   border-color: transparent;
 }
+.capa.cargando label::after {
+  content: " cargando…"; font-size: .78rem; color: var(--tinta-suave);
+}
+.capa.cargando { opacity: .7; }
 .capa .error { grid-column: 3 / -1; font-size: .8rem; color: #B3261E; }
 
 /* Controles */

@@ -84,7 +84,7 @@
       "grupo": "Desarrollo urbano",
       "tipo": "teselas",
       "plantilla": "data/parcelas/{z}/{x}/{y}.geojson",
-      "zoomTeselas": 15,
+      "zoomTeselas": 14,
       "zoomMinimo": 16,
       "geometria": "poligono",
       "visible": false,
@@ -131,7 +131,8 @@
           "unidad": "m²",
           "decimales": 0
         }
-      ]
+      ],
+      "soloAlPrender": true
     },
     {
       "id": "barrios_populares",

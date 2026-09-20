@@ -284,13 +284,14 @@
     return def.geometria === "punto" ? "puntos" : def.geometria === "linea" ? "lineas" : "poligonos";
   }
 
-  async function cargarCapa(def) {
-    const registro = { def, datos: null, capa: null, stats: {}, error: null };
+  function cargarCapa(def) {
+    const registro = { def, datos: null, capa: null, stats: {}, error: null, cargada: false, promesa: null };
     estado.capas.set(def.id, registro);
     if (def.tipo === "teselas") {
       // capa partida en teselas: se carga sola al acercar el mapa
       registro.datos = { type: "FeatureCollection", features: [] };
       registro.teselas = new Map();
+      registro.cargada = true;
       registro.capa = L.geoJSON(null, {
         pane: paneDe(def),
         style: (f) => estiloElemento(def, f),
@@ -301,8 +302,21 @@
           if (t) l.bindTooltip(escapar(t), { sticky: true, direction: "top", opacity: 0.95 });
         }
       });
-      return registro;
     }
+    return registro;
+  }
+
+  // Trae el archivo de una capa. Solo se llama cuando hace falta: al abrir el sitio
+  // con las capas visibles, al prender una capa o al explorar sus datos.
+  function asegurarCapa(id) {
+    const reg = estado.capas.get(id);
+    if (!reg || reg.cargada || reg.error) return Promise.resolve(reg);
+    if (!reg.promesa) reg.promesa = traerDatos(reg);
+    return reg.promesa;
+  }
+
+  async function traerDatos(registro) {
+    const def = registro.def;
     try {
       const r = await fetch(def.archivo, { cache: "no-cache" });
       if (!r.ok) throw new Error(`respuesta ${r.status}`);
@@ -319,11 +333,13 @@
           if (t) l.bindTooltip(escapar(t), { sticky: true, direction: "top", opacity: 0.95 });
         }
       });
+      registro.cargada = true;
       indexar(def, registro);
     } catch (err) {
       registro.error = `No se pudo cargar ${def.archivo} (${err.message}). Revisá que el archivo exista y que la ruta en config.json sea la correcta.`;
       console.error(err);
     }
+    actualizarFilaCapa(def.id);
     return registro;
   }
 
@@ -423,6 +439,7 @@
         const multicolor = def.estilo && def.estilo.colorSegun;
         const fila = document.createElement("div");
         fila.className = "capa";
+        fila.dataset.capa = def.id;
         const idc = `capa-${def.id}`;
         const tipoMuestra = def.geometria === "punto" ? "punto" : def.geometria === "linea" ? "linea" : "";
         const fondo = def.geometria === "linea" || !b.fill ? "transparent" : b.fillColor;
@@ -469,9 +486,15 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  function alternarCapa(id, visible) {
-    const reg = estado.capas.get(id);
-    if (!reg || !reg.capa) return;
+  async function alternarCapa(id, visible) {
+    let reg = estado.capas.get(id);
+    if (!reg) return;
+    if (visible && !reg.cargada && !reg.error) {
+      marcarCargando(id, true);
+      reg = await asegurarCapa(id);
+      marcarCargando(id, false);
+    }
+    if (!reg.capa) return;
     if (visible) { reg.capa.addTo(estado.mapa); ordenarCapas(); if (reg.def.tipo === "teselas") actualizarTeselas(); }
     else {
       estado.mapa.removeLayer(reg.capa);
@@ -481,9 +504,28 @@
     if (chk) chk.checked = visible;
   }
 
+  function marcarCargando(id, cargando) {
+    const fila = document.querySelector(`.capa[data-capa="${CSS.escape(id)}"]`);
+    if (fila) fila.classList.toggle("cargando", cargando);
+  }
+
+  // Redibuja una fila de la lista cuando la capa termina de cargar o falla
+  function actualizarFilaCapa(id) {
+    const fila = document.querySelector(`.capa[data-capa="${CSS.escape(id)}"]`);
+    if (!fila) return;
+    const reg = estado.capas.get(id);
+    fila.classList.remove("cargando");
+    const aviso = fila.querySelector(".error");
+    if (reg.error && !aviso) {
+      fila.insertAdjacentHTML("beforeend", `<span class="error">${escapar(reg.error)}</span>`);
+      const chk = fila.querySelector("input");
+      if (chk) { chk.checked = false; chk.disabled = true; }
+    }
+  }
+
   // ---------- explorar datos ----------
   function prepararExplorar() {
-    const conVars = estado.config.capas.filter((d) => d.variables && d.variables.length && estado.capas.get(d.id).datos);
+    const conVars = estado.config.capas.filter((d) => d.variables && d.variables.length && !estado.capas.get(d.id).error);
     if (!conVars.length) return;
     $("seccionExplorar").hidden = false;
     const selCapa = $("selCapa");
@@ -493,7 +535,13 @@
     $("selVariable").addEventListener("change", (e) => elegirVariable(e.target.value));
   }
 
-  function elegirCapa(id, clave, anio, rango) {
+  async function elegirCapa(id, clave, anio, rango) {
+    if (id && !estado.capas.get(id).cargada && !estado.capas.get(id).error) {
+      $("selCapa").disabled = true;
+      await asegurarCapa(id);
+      $("selCapa").disabled = false;
+    }
+    if (id && estado.capas.get(id).error) return;
     const anterior = estado.explorar.capaId;
     estado.explorar = { capaId: id || null, clave: null, anio: null, rango: null, categorias: null };
     if (anterior) repintar(anterior);
@@ -509,7 +557,7 @@
       return;
     }
     const def = estado.capas.get(id).def;
-    alternarCapa(id, true);
+    await alternarCapa(id, true);
     selVar.disabled = false;
     // agrupa las variables en el desplegable si tienen "grupo"
     const grupos = new Map();
@@ -790,8 +838,8 @@
     const input = $("busqueda"), lista = $("resultados");
     let actual = [], activo = -1;
     const cerrar = () => { lista.hidden = true; input.setAttribute("aria-expanded", "false"); activo = -1; };
-    const ir = (r) => {
-      alternarCapa(r.id, true);
+    const ir = async (r) => {
+      await alternarCapa(r.id, true);
       seleccionar(r.id, r.l);
       if (r.l.getBounds) encuadrar(r.l.getBounds());
       else estado.mapa.setView(r.l.getLatLng(), 16);
@@ -842,24 +890,24 @@
     history.replaceState(null, "", `${location.pathname}${location.search}#${ps.toString()}`);
   }
 
-  function leerUrl() {
+  async function leerUrl() {
     const ps = new URLSearchParams(location.hash.slice(1));
     const z = ps.get("z"), c = ps.get("c");
     if (z && c) {
       const [lat, lng] = c.split(",").map(Number);
       if (isFinite(lat) && isFinite(lng)) estado.mapa.setView([lat, lng], Number(z));
     }
-    const valida = (id) => id && estado.capas.get(id) && estado.capas.get(id).datos &&
+    const valida = (id) => id && estado.capas.get(id) && !estado.capas.get(id).error &&
       $("selCapa").querySelector(`option[value="${CSS.escape(id)}"]`);
     const capa = ps.get("capa");
     if (valida(capa)) {
       const r = ps.get("rango");
       const rango = r ? r.split(",").map(Number) : null;
-      elegirCapa(capa, ps.get("var"), ps.get("anio"), rango && rango.every(isFinite) ? rango : null);
+      await elegirCapa(capa, ps.get("var"), ps.get("anio"), rango && rango.every(isFinite) ? rango : null);
       return;
     }
     const ini = estado.config.explorarInicial;
-    if (ini && valida(ini.capa)) elegirCapa(ini.capa, ini.variable, ini.anio);
+    if (ini && valida(ini.capa)) await elegirCapa(ini.capa, ini.variable, ini.anio);
   }
   // ---------- panel en celulares ----------
   function cerrarPanelMovil() { $("panel").classList.remove("abierto"); }
@@ -1000,6 +1048,19 @@
     });
   }
 
+  // Las capas apagadas se traen de a una, sin frenar el uso del mapa
+  async function cargarRestantes() {
+    // con datos móviles limitados o conexión lenta, cada capa se trae recién al prenderla
+    const con = navigator.connection || {};
+    if (con.saveData || /2g/.test(con.effectiveType || "")) return;
+    for (const def of estado.config.capas) {
+      const reg = estado.capas.get(def.id);
+      if (reg.cargada || reg.error || def.soloAlPrender) continue;
+      await asegurarCapa(def.id);
+      await new Promise((r) => setTimeout(r, 60));
+    }
+  }
+
   // ---------- inicio ----------
   async function iniciar() {
     prepararPanelMovil();
@@ -1020,7 +1081,9 @@
     $("subtitulo").textContent = cfg.subtitulo || "";
 
     estado.mapa = crearMapa(cfg);
-    await Promise.all((cfg.capas || []).map(cargarCapa));
+    (cfg.capas || []).forEach(cargarCapa);
+    // primero solo las capas que se muestran al abrir: el resto llega después
+    await Promise.all((cfg.capas || []).filter((d) => d.visible).map((d) => asegurarCapa(d.id)));
     [...ordenDibujo()].reverse().forEach((def) => {
       const reg = estado.capas.get(def.id);
       if (def.visible && reg.capa) reg.capa.addTo(estado.mapa);
@@ -1029,7 +1092,8 @@
     prepararExplorar();
     prepararBusqueda();
     prepararEquipo();
-    leerUrl();
+    await leerUrl();
+    cargarRestantes();
 
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
       estado.capas.forEach((_, id) => repintar(id));

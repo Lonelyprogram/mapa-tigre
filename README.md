@@ -120,9 +120,13 @@ python -m http.server 8000
 
 y abrir `http://localhost:8000`.
 
+## Cómo carga el sitio
+
+Al abrir, el sitio trae solo las capas que arrancan encendidas (unos 50 KB). El resto se descarga en segundo plano, sin frenar el mapa, y cualquier capa que se prenda antes de estar lista se trae en el momento. En `config.json`, `"soloAlPrender": true` excluye una capa de esa carga en segundo plano: conviene para las pesadas, como las manzanas. Con ahorro de datos activado o conexión lenta, todas las capas esperan a que las prendan.
+
 ## Capas en teselas (parcelario)
 
-El parcelario de ARBA son 103.806 parcelas: demasiado para un solo archivo. Está partido en 406 teselas bajo `data/parcelas/15/{x}/{y}.geojson`, y el sitio carga solo las que entran en pantalla, a partir del zoom 16. En `config.json` la capa se declara con `"tipo": "teselas"`, `"plantilla"`, `"zoomTeselas"` y `"zoomMinimo"`. Para regenerar las teselas desde un shapefile nuevo hay que volver a partirlo con el mismo esquema (z15, coordenadas a 6 decimales) y reemplazar la carpeta.
+El parcelario de ARBA son 103.806 parcelas: demasiado para un solo archivo. Está partido en 122 teselas bajo `data/parcelas/14/{x}/{y}.geojson`, y el sitio carga solo las que entran en pantalla, a partir del zoom 16. En `config.json` la capa se declara con `"tipo": "teselas"`, `"plantilla"`, `"zoomTeselas"` y `"zoomMinimo"`. Para regenerar las teselas desde un shapefile nuevo hay que volver a partirlo con el mismo esquema (z14, coordenadas a 6 decimales) y reemplazar la carpeta.
 
 ## Código de zonificación
 
