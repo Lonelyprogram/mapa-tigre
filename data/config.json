@@ -43,7 +43,7 @@
       "visible": true,
       "titulo": "nombre",
       "busqueda": "nombre",
-      "fuente": "ARBA, Gerencia de Servicios Catastrales, vía IGN",
+      "fuente": "Límite: ARBA, vía IGN. Niveles de exposición a amenazas hidrometeorológicas: SINAGIR, vía IGN (escala regional, no específica de Tigre).",
       "estilo": {
         "color": "#9A6B2F",
         "grosor": 2.5,
@@ -54,7 +54,11 @@
         "cabecera": "Ciudad cabecera",
         "sup_km2": "Superficie (km²)",
         "perim_km": "Perímetro (km)",
-        "fuente": "Fuente"
+        "fuente": "Fuente",
+        "sinagir_region": "Exposición SINAGIR",
+        "sinagir_inundacion": "Inundaciones",
+        "sinagir_tormentas": "Tormentas",
+        "sinagir_total": "Total de exposición"
       }
     },
     {
@@ -329,7 +333,7 @@
       "visible": false,
       "titulo": "partido",
       "busqueda": "partido",
-      "fuente": "IGN, SIG250. Superficie, perímetro y compacidad calculados en POSGAR 2007 faja 5.",
+      "fuente": "IGN, SIG250. Superficie, perímetro y compacidad calculados en POSGAR 2007 faja 5. Dengue y zika 2024: Sistema Nacional de Vigilancia de la Salud, vía IGN.",
       "estilo": {
         "color": "#4E6F73",
         "relleno": "#8DB8A9",
@@ -341,7 +345,9 @@
         "cabecera": "Ciudad cabecera",
         "sup_km2": "Superficie (km²)",
         "perim_km": "Perímetro (km)",
-        "compacidad": "Compacidad"
+        "compacidad": "Compacidad",
+        "dengue_2024": "Casos de dengue y zika (2024)",
+        "dengue_cat_2024": "Categoría de registros"
       },
       "clasificacion": "cuantiles",
       "clases": 5,
@@ -369,9 +375,105 @@
           "campo": "es_tigre",
           "nombre": "Tigre y vecinos",
           "tipo": "categoria"
+        },
+        {
+          "campo": "dengue_2024",
+          "grupo": "Salud",
+          "nombre": "Casos de dengue y zika (2024)",
+          "decimales": 0,
+          "descripcion": "Casos confirmados registrados en el partido durante 2024."
+        },
+        {
+          "campo": "dengue_cat_2024",
+          "grupo": "Salud",
+          "nombre": "Nivel de registros de dengue",
+          "tipo": "categoria",
+          "colores": {
+            "Muy bajos registros": "#F1EBDC",
+            "Bajos registros": "#C9D8C2",
+            "Registros medios": "#8DB8A9",
+            "Altos registros": "#C2622C",
+            "Muy altos registros": "#9A4A2B"
+          }
         }
       ],
       "ordenMapa": 95
+    },
+    {
+      "id": "cuencas",
+      "nombre": "Cuencas hídricas",
+      "grupo": "Riesgo hídrico",
+      "archivo": "data/cuencas.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "ordenMapa": 88,
+      "fuente": "COHIFE, vía IGN. Recortadas al partido de Tigre.",
+      "estilo": {
+        "color": "#2F6F8F",
+        "relleno": "#6FA8C4",
+        "opacidadRelleno": 0.3,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Cuenca",
+        "sistema": "Sistema",
+        "region": "Región hídrica",
+        "sup_km2": "Superficie en Tigre (km²)",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "nombre",
+          "nombre": "Cuenca",
+          "tipo": "categoria"
+        },
+        {
+          "campo": "sup_km2",
+          "nombre": "Superficie en Tigre",
+          "unidad": "km²",
+          "decimales": 1
+        }
+      ]
+    },
+    {
+      "id": "puertos_alerta",
+      "nombre": "Puertos: alturas de alerta",
+      "grupo": "Riesgo hídrico",
+      "archivo": "data/puertos_alerta.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Prefectura Naval Argentina, vía IGN. La cota de alerta es la altura del río a partir de la cual se activan los avisos; la de evacuación, cuando corresponde evacuar la zona ribereña.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#2F6F8F",
+        "radio": 8,
+        "grosor": 1.5
+      },
+      "campos": {
+        "nombre": "Puerto",
+        "alerta_m": "Cota de alerta (m)",
+        "evacuacion_m": "Cota de evacuación (m)",
+        "en_tigre": "Dentro de Tigre",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "alerta_m",
+          "nombre": "Cota de alerta",
+          "unidad": "m",
+          "decimales": 1
+        },
+        {
+          "campo": "evacuacion_m",
+          "nombre": "Cota de evacuación",
+          "unidad": "m",
+          "decimales": 1
+        }
+      ]
     },
     {
       "id": "educacion",
