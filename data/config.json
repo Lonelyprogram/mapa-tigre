@@ -8,23 +8,23 @@
   "limitesNavegacion": [[-34.85, -59.1], [-33.7, -58.05]],
   "mapasBase": [
     {
+      "nombre": "OpenStreetMap",
+      "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "atribucion": "&copy; <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
+      "zoomMaximo": 19,
+      "inicial": true
+    },
+    {
       "nombre": "Argenmap gris",
       "url": "https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/mapabase_gris@EPSG%3A3857@png/{z}/{x}/{-y}.png",
       "atribucion": "<a href=\"https://www.ign.gob.ar/AreaServicios/Argenmap/Introduccion\" target=\"_blank\">Instituto Geográfico Nacional</a> + <a href=\"https://www.osm.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
-      "zoomMaximo": 18,
-      "inicial": true
+      "zoomMaximo": 18
     },
     {
       "nombre": "Argenmap",
       "url": "https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/capabaseargenmap@EPSG%3A3857@png/{z}/{x}/{-y}.png",
       "atribucion": "<a href=\"https://www.ign.gob.ar/AreaServicios/Argenmap/Introduccion\" target=\"_blank\">Instituto Geográfico Nacional</a> + <a href=\"https://www.osm.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
       "zoomMaximo": 18
-    },
-    {
-      "nombre": "OpenStreetMap",
-      "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-      "atribucion": "&copy; <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
-      "zoomMaximo": 19
     },
     {
       "nombre": "Satelital",
@@ -66,7 +66,7 @@
       "visible": true,
       "titulo": "nombre",
       "busqueda": "nombre",
-      "fuente": "INDEC, Base de Asentamientos Humanos (ubicación de referencia de cada localidad).",
+      "fuente": "INDEC: punto de referencia de cada localidad y listado de localidades 2022 con su superficie.",
       "estilo": {
         "color": "#FFFFFF",
         "relleno": "#1C2B2F",
@@ -75,8 +75,18 @@
       },
       "campos": {
         "nombre": "Localidad",
-        "codigo": "Código INDEC"
-      }
+        "codigo_2022": "Código INDEC 2022",
+        "sup_km2": "Superficie (km²)",
+        "codigo": "Código BAHRA"
+      },
+      "variables": [
+        {
+          "campo": "sup_km2",
+          "nombre": "Superficie",
+          "unidad": "km²",
+          "decimales": 1
+        }
+      ]
     },
     {
       "id": "parcelas",
@@ -535,6 +545,80 @@
           "tipo": "categoria"
         }
       ]
+    },
+    {
+      "id": "calles",
+      "nombre": "Calles",
+      "grupo": "Movilidad",
+      "archivo": "data/calles.geojson",
+      "geometria": "linea",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "soloAlPrender": true,
+      "ordenMapa": 60,
+      "fuente": "OpenStreetMap, colaboradores. Recortado al partido de Tigre. El sentido de circulación proviene del campo oneway de OSM y puede estar desactualizado en calles de barrio.",
+      "estilo": {
+        "color": "#7A8B95",
+        "grosor": 1.6,
+        "opacidad": 0.9,
+        "colorSegun": "sentido",
+        "colores": {
+          "Doble mano": "#7A8B95",
+          "Mano única": "#C2622C"
+        }
+      },
+      "campos": {
+        "nombre": "Calle",
+        "tipo": "Tipo",
+        "sentido": "Sentido",
+        "largo_km": "Largo (km)",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "sentido",
+          "nombre": "Sentido de circulación",
+          "tipo": "categoria",
+          "colores": {
+            "Doble mano": "#7A8B95",
+            "Mano única": "#C2622C"
+          }
+        },
+        {
+          "campo": "tipo",
+          "nombre": "Tipo de vía",
+          "tipo": "categoria"
+        },
+        {
+          "campo": "largo_km",
+          "nombre": "Largo",
+          "unidad": "km",
+          "decimales": 2
+        }
+      ]
+    },
+    {
+      "id": "sentido",
+      "nombre": "Sentido de circulación",
+      "grupo": "Movilidad",
+      "archivo": "data/sentido_flechas.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "soloAlPrender": true,
+      "zoomMinimo": 16,
+      "soloEnVista": true,
+      "maximoEnVista": 700,
+      "ordenMapa": 58,
+      "titulo": "nombre",
+      "fuente": "Flechas calculadas sobre las calles de mano única de OpenStreetMap: una cada 150 metros, en la dirección permitida.",
+      "estilo": {
+        "flecha": "angulo",
+        "relleno": "#C2622C"
+      },
+      "campos": {
+        "nombre": "Calle"
+      }
     },
     {
       "id": "colectivos",

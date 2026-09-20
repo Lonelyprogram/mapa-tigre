@@ -218,6 +218,8 @@ select {
 .conteo { margin: 8px 0 0; font-size: .85rem; }
 .conteo button { margin-left: 6px; padding: 2px 8px; font-size: .8rem; }
 
+.flecha svg { width: 18px; height: 18px; display: block; opacity: .9; }
+
 /* Mapa */
 .mapa-contenedor { position: relative; flex: 1; min-width: 0; }
 #mapa { position: absolute; inset: 0; background: var(--rio-claro); }
