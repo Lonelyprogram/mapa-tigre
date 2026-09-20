@@ -231,7 +231,7 @@
       "visible": false,
       "titulo": "nombre",
       "busqueda": "nombre",
-      "fuente": "Registro Nacional de Barrios Populares (RENABAP), Subsecretaría de Integración Socio Urbana. Versión del registro con 6.467 barrios en todo el país (base 2023). Familias y viviendas son estimaciones del propio registro; los servicios describen el modo en que accede la mayoría del barrio.",
+      "fuente": "Registro Nacional de Barrios Populares (RENABAP), Subsecretaría de Integración Socio Urbana. Versión del registro con 6.467 barrios en todo el país (base 2023). Familias y viviendas son estimaciones del propio registro; los servicios describen el modo en que accede la mayoría del barrio. La categoría IGN proviene de la capa Registro Barrios Populares RENABAP 2023 del Instituto Geográfico Nacional, que pondera el acceso a luz, agua, cloaca y energía para cocinar y calefaccionar.",
       "estilo": {
         "color": "#7A2E22",
         "relleno": "#B5566B",
@@ -253,7 +253,8 @@
         "efluentes_cloacales": "Desagüe cloacal",
         "cocina": "Cocina",
         "calefaccion": "Calefacción",
-        "titulo_propiedad": "Título de propiedad"
+        "titulo_propiedad": "Título de propiedad",
+        "indice_servicios": "Categoría IGN"
       },
       "clasificacion": "cuantiles",
       "clases": 5,
@@ -270,6 +271,20 @@
             "3 de 3 servicios": "#16525A"
           },
           "descripcion": "Cuántos de estos tres servicios llegan por red en la mayoría del barrio: luz (formal o regular), agua (formal o regular) y cloaca."
+        },
+        {
+          "campo": "indice_servicios",
+          "grupo": "Servicios",
+          "nombre": "Categoría IGN de carencia de servicios",
+          "tipo": "categoria",
+          "colores": {
+            "Muy bajo": "#16525A",
+            "Bajo": "#8DB8A9",
+            "Medio": "#D6A184",
+            "Alto": "#9A4A2B",
+            "Muy alto": "#6E2F1B"
+          },
+          "descripcion": "Índice del IGN sobre los mismos servicios. En Tigre, los barrios que tienen los tres por red caen en «Muy bajo» y los que no tienen ninguno en «Alto» o «Muy alto»: la escala mide carencia, no acceso."
         },
         {
           "campo": "energia",
@@ -733,7 +748,7 @@
       "visible": false,
       "titulo": "nombre",
       "busqueda": "nombre",
-      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "fuente": "Estaciones: IGN. Ramales y cantidad de servicios: GTFS de Trenes Argentinos, cuadro de febrero de 2020, anterior a la pandemia. Sirve de referencia, no como horario vigente. Las estaciones del Belgrano Norte no están en ese archivo y se completaron a mano.",
       "estilo": {
         "color": "#1C2B2F",
         "relleno": "#FFFFFF",
@@ -742,8 +757,23 @@
       },
       "campos": {
         "nombre": "Estación",
-        "operador": "Operador"
-      }
+        "ramal": "Ramal",
+        "operador": "Operador",
+        "servicios_2020": "Servicios por día hábil (cuadro 2020)"
+      },
+      "variables": [
+        {
+          "campo": "ramal",
+          "nombre": "Ramal",
+          "tipo": "categoria"
+        },
+        {
+          "campo": "servicios_2020",
+          "nombre": "Servicios por día hábil (2020)",
+          "decimales": 0,
+          "descripcion": "Cantidad de trenes que paraban en la estación un día hábil, según el cuadro de febrero de 2020."
+        }
+      ]
     },
     {
       "id": "ferrocarril",
