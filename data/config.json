@@ -333,7 +333,7 @@
       "visible": false,
       "titulo": "partido",
       "busqueda": "partido",
-      "fuente": "IGN, SIG250. Superficie, perímetro y compacidad calculados en POSGAR 2007 faja 5. Dengue y zika 2024: Sistema Nacional de Vigilancia de la Salud, vía IGN.",
+      "fuente": "IGN, SIG250. Superficie, perímetro y compacidad calculados en POSGAR 2007 faja 5. Dengue y zika 2024: Sistema Nacional de Vigilancia de la Salud, vía IGN. Calidad de los materiales de la vivienda y cobertura de salud: Censo 2022, INDEC. IVSD 2024: Plan Nacional de Adaptación al Cambio Climático, MAyDS. Todo vía IGN.",
       "estilo": {
         "color": "#4E6F73",
         "relleno": "#8DB8A9",
@@ -347,7 +347,13 @@
         "perim_km": "Perímetro (km)",
         "compacidad": "Compacidad",
         "dengue_2024": "Casos de dengue y zika (2024)",
-        "dengue_cat_2024": "Categoría de registros"
+        "dengue_cat_2024": "Categoría de registros",
+        "ivsd": "IVSD 2024",
+        "sincob_pct": "Sin cobertura de salud (%)",
+        "sincob_cat": "Nivel de cobertura",
+        "inmat_1": "Hogares con materiales de calidad I (%)",
+        "inmat_4": "Hogares con materiales de calidad IV (%)",
+        "inmat_cat": "Categoría INMAT"
       },
       "clasificacion": "cuantiles",
       "clases": 5,
@@ -395,6 +401,50 @@
             "Altos registros": "#C2622C",
             "Muy altos registros": "#9A4A2B"
           }
+        },
+        {
+          "campo": "ivsd",
+          "grupo": "Vulnerabilidad",
+          "nombre": "Índice de vulnerabilidad social ante desastres (2024)",
+          "decimales": 1,
+          "descripcion": "IVSD del Plan Nacional de Adaptación al Cambio Climático. Cuanto más alto, mayor vulnerabilidad frente a un desastre."
+        },
+        {
+          "campo": "sincob_pct",
+          "grupo": "Salud",
+          "nombre": "Población sin cobertura de salud (2022)",
+          "unidad": "%",
+          "decimales": 1,
+          "descripcion": "Sin obra social, prepaga ni plan estatal. Coincide con lo que da la suma de nuestros radios censales."
+        },
+        {
+          "campo": "sincob_cat",
+          "grupo": "Salud",
+          "nombre": "Nivel de población sin cobertura",
+          "tipo": "categoria",
+          "colores": {
+            "Muy bajo": "#F1EBDC",
+            "Bajo": "#C9D8C2",
+            "Medio": "#8DB8A9",
+            "Alto": "#C2622C",
+            "Muy alto": "#9A4A2B"
+          }
+        },
+        {
+          "campo": "inmat_4",
+          "grupo": "Vivienda",
+          "nombre": "Hogares con materiales de calidad IV (2022)",
+          "unidad": "%",
+          "decimales": 1,
+          "descripcion": "Calidad IV es la más precaria de la escala INMAT del INDEC: materiales de baja calidad en pisos, paredes y techos, sin aislación ni terminaciones."
+        },
+        {
+          "campo": "inmat_1",
+          "grupo": "Vivienda",
+          "nombre": "Hogares con materiales de calidad I (2022)",
+          "unidad": "%",
+          "decimales": 1,
+          "descripcion": "Calidad I es la mejor de la escala INMAT: materiales resistentes y con todos los elementos de aislación y terminación."
         }
       ],
       "ordenMapa": 95
