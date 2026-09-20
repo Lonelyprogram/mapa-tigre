@@ -84,6 +84,9 @@ Cada capa admite:
 | `busqueda` | Campo en el que busca el buscador. Si falta, la capa no aparece en la búsqueda. |
 | `fuente` | Texto de la fuente, se muestra en "Explorar datos". |
 | `estilo` | `color` (borde), `relleno`, `opacidadRelleno`, `grosor`, `radio` (puntos), `guiones` (línea punteada), `soloBorde`, `radioSegun` (tamaño del punto según un campo), `colorSegun` y `colores` (color fijo por valor de un campo, como cada línea de colectivo). |
+| `zoomMinimo` | Zoom a partir del cual se dibuja la capa; más lejos queda oculta y la lista avisa "(al acercar)". |
+| `soloEnVista` | Dibuja solo los elementos que entran en pantalla (con `maximoEnVista` como tope). Sirve para capas de muchos puntos, como las flechas de sentido. |
+| `soloAlPrender` | Excluye la capa de la carga en segundo plano. |
 | `ordenMapa` | Opcional. Controla qué capa se dibuja encima: menor número, más arriba. Por defecto vale el orden de la lista. |
 | `campos` | Campos que muestra la ficha, con su nombre visible: `{"campo": "Nombre visible"}`. Si falta, muestra todos. |
 | `variables` | Lista de variables para explorar (ver abajo). |
@@ -147,6 +150,7 @@ Falta el plano de zonificación en formato SIG. Cuando esté, se suma como capa 
 - `tigre_limite.geojson`: límite del partido de Tigre (ARBA, vía IGN).
 - Equipamiento y servicios del IGN: `educacion`, `salud`, `seguridad`, `bomberos`, `cultura`, `deporte`, `culto`, `estaciones_servicio`, `reciclaje`, `espacios_verdes` y `areas_industriales`. Los archivos originales tenían los acentos dañados (se habían guardado con otra codificación); se repararon con un diccionario de español y una lista revisada a mano de nombres propios. Conviene corregir en origen cualquier nombre que haya quedado mal.
 - Transporte: `estaciones_tren`, `ferrocarril` y `rutas` (IGN) y `colectivos` (recorridos nacionales, provinciales y municipales).
+- `calles.geojson` y `sentido_flechas.geojson`: callejero de OpenStreetMap recortado a Tigre, con una línea por calle (nombre, tipo, sentido y largo) y las flechas de las calles de mano única, una cada 150 metros. En OSM el sentido puede venir marcado al revés (`oneway=-1`); esas geometrías se invierten al procesar para que las flechas apunten bien.
 - `localidades.geojson`: punto de referencia de cada localidad según INDEC.
 - `region_partidos.geojson`: Tigre y partidos limítrofes, con superficie, perímetro y compacidad (índice de Polsby-Popper) calculados en POSGAR 2007 faja 5.
 

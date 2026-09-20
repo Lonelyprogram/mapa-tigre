@@ -62,105 +62,31 @@
       "nombre": "Localidades",
       "grupo": "Desarrollo urbano",
       "archivo": "data/localidades.geojson",
-      "geometria": "poligono",
+      "geometria": "punto",
       "visible": true,
       "titulo": "nombre",
       "busqueda": "nombre",
-      "fuente": "Polígonos y superficie: INDEC, localidades 2022. Población y demás indicadores: sumatoria de los radios censales cuyo centro cae en cada localidad, con los censos 2001 y 2022. «Islas del Delta» es el resto del partido, fuera de las localidades del continente.",
+      "fuente": "INDEC: punto de referencia de cada localidad y listado de localidades 2022 con su superficie.",
       "estilo": {
-        "color": "#4E6F73",
-        "relleno": "#8DB8A9",
-        "opacidadRelleno": 0.1,
-        "grosor": 1.4
+        "color": "#FFFFFF",
+        "relleno": "#1C2B2F",
+        "radio": 5,
+        "grosor": 1.5
       },
       "campos": {
         "nombre": "Localidad",
-        "codigo": "Código INDEC 2022",
+        "codigo_2022": "Código INDEC 2022",
         "sup_km2": "Superficie (km²)",
-        "radios": "Radios censales",
-        "pob_2022": "Población 2022",
-        "pob_2001": "Población 2001",
-        "hog_2022": "Hogares 2022",
-        "nbi_2022": "Hogares con NBI (%)",
-        "cloaca_2022": "Hogares con cloaca (%)",
-        "sec_2022": "Secundario completo o más (%)",
-        "sincob_2022": "Sin cobertura de salud (%)",
-        "renabap_fam": "Familias en barrios populares"
+        "codigo": "Código BAHRA"
       },
       "variables": [
         {
-          "id": "pob",
-          "grupo": "Población",
-          "nombre": "Población",
-          "series": {"2001": "pob_2001", "2022": "pob_2022"},
-          "unidad": "hab.",
-          "decimales": 0
-        },
-        {
-          "id": "dens",
-          "grupo": "Población",
-          "nombre": "Densidad",
-          "series": {"2001": "dens_2001", "2022": "dens_2022"},
-          "unidad": "hab./km²",
-          "decimales": 0
-        },
-        {
-          "campo": "var_pob",
-          "grupo": "Población",
-          "nombre": "Variación de población 2001-2022",
-          "unidad": "%",
-          "decimales": 0,
-          "paleta": "divergente",
-          "limites": [-20, 300],
-          "descripcion": "Nordelta y Dique Luján multiplicaron su población desde 2001, así que sus valores se salen de la escala."
-        },
-        {
           "campo": "sup_km2",
-          "grupo": "Población",
           "nombre": "Superficie",
           "unidad": "km²",
           "decimales": 1
-        },
-        {
-          "campo": "nbi_2022",
-          "grupo": "Condiciones de vida",
-          "nombre": "Hogares con NBI (2022)",
-          "unidad": "%",
-          "decimales": 1
-        },
-        {
-          "campo": "cloaca_2022",
-          "grupo": "Servicios",
-          "nombre": "Hogares con cloaca (2022)",
-          "unidad": "%",
-          "decimales": 1
-        },
-        {
-          "campo": "sec_2022",
-          "grupo": "Educación",
-          "nombre": "Secundario completo o más (2022)",
-          "unidad": "%",
-          "decimales": 1
-        },
-        {
-          "campo": "sincob_2022",
-          "grupo": "Condiciones de vida",
-          "nombre": "Sin cobertura de salud (2022)",
-          "unidad": "%",
-          "decimales": 1
-        },
-        {
-          "campo": "renabap_fam",
-          "grupo": "Condiciones de vida",
-          "nombre": "Familias en barrios populares",
-          "decimales": 0
         }
-      ],
-      "etiquetaFija": true,
-      "ordenMapa": 85,
-      "soloAlPrender": false,
-      "clasificacion": "cuantiles",
-      "clases": 5
+      ]
     },
     {
       "id": "parcelas",
