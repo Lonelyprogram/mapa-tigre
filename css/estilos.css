@@ -300,3 +300,53 @@ select {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+
+/* ---------- Páginas de contenido (código de zonificación) ---------- */
+body.pagina { background: var(--papel); }
+.hoja { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+.hoja h1 { margin: 0 0 6px; font-size: 2rem; color: var(--rio); letter-spacing: -.01em; }
+.entrada { margin: 0 0 10px; color: var(--tinta-suave); max-width: 70ch; }
+.advertencia {
+  max-width: 70ch; margin: 0 0 22px; padding: 10px 14px;
+  background: var(--superficie); border-left: 4px solid var(--foco); border-radius: var(--radio-chico);
+  font-size: .92rem;
+}
+.controles { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; margin-bottom: 12px; }
+.controles .campo { margin: 0; min-width: 180px; flex: 1 1 180px; }
+.controles input {
+  width: 100%; padding: 8px 10px; font: inherit; color: var(--tinta);
+  background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio-chico);
+}
+.controles .boton { flex: 0 0 auto; }
+
+.zonas { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 16px; margin-top: 10px; }
+.zona {
+  padding: 16px 18px; background: var(--superficie);
+  border: 1px solid var(--borde); border-radius: var(--radio); border-top: 5px solid var(--rio);
+}
+.zona-residencial { border-top-color: #D98C3A; }
+.zona-central { border-top-color: #B5566B; }
+.zona-industrial { border-top-color: #7D5BA6; }
+.zona-rural { border-top-color: #6F8A3E; }
+.zona-complementaria { border-top-color: #4F9E8F; }
+.zona-especial { border-top-color: #5B6FA8; }
+.zona header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+.zona .codigo { font-size: 1.5rem; font-weight: 700; color: var(--rio); }
+.zona h2 { margin: 0; font-size: .95rem; font-weight: 400; color: var(--tinta-suave); }
+.zona dl { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 4px 12px; font-size: .88rem; }
+.zona dt { color: var(--tinta-suave); }
+.zona dd { margin: 0; text-align: right; overflow-wrap: anywhere; }
+.zona details { margin-top: 12px; font-size: .85rem; }
+.zona summary { cursor: pointer; color: var(--rio); }
+.zona details ul { margin: 8px 0 0; padding-left: 18px; color: var(--tinta-suave); }
+.zona details li + li { margin-top: 5px; }
+
+.tabla-envoltura { overflow-x: auto; margin-top: 10px; }
+.tabla { border-collapse: collapse; width: 100%; font-size: .88rem; }
+.tabla th, .tabla td { padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--borde); white-space: nowrap; }
+.tabla th { position: sticky; top: 0; background: var(--rio); color: #FFFFFF; font-size: .82rem; }
+.tabla tbody tr:hover { background: var(--rio-claro); }
+
+.pie-pagina { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--borde); font-size: .85rem; color: var(--tinta-suave); }
+.pie-pagina p { max-width: 70ch; }

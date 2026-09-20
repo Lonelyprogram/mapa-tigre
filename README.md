@@ -120,8 +120,19 @@ python -m http.server 8000
 
 y abrir `http://localhost:8000`.
 
+## Capas en teselas (parcelario)
+
+El parcelario de ARBA son 103.806 parcelas: demasiado para un solo archivo. Está partido en 406 teselas bajo `data/parcelas/15/{x}/{y}.geojson`, y el sitio carga solo las que entran en pantalla, a partir del zoom 16. En `config.json` la capa se declara con `"tipo": "teselas"`, `"plantilla"`, `"zoomTeselas"` y `"zoomMinimo"`. Para regenerar las teselas desde un shapefile nuevo hay que volver a partirlo con el mismo esquema (z15, coordenadas a 6 decimales) y reemplazar la carpeta.
+
+## Código de zonificación
+
+`zonificacion.html` muestra las planillas de indicadores urbanos por zona (F.O.S., F.O.T., densidad, lote mínimo, retiros, altura y condiciones particulares), a partir de `data/zonas_codigo.json`. Para editar un dato o sumar una zona alcanza con tocar ese archivo.
+
+Falta el plano de zonificación en formato SIG. Cuando esté, se suma como capa de polígonos y se puede colorear el parcelario por zona.
+
 ## Datos incluidos
 
+- `parcelas/` y `manzanas.geojson`: parcelario y manzanas de ARBA del partido de Tigre (110.101 y 110.102), con partida, nomenclatura catastral, tipo y superficie.
 - `barrios_populares.geojson`: los 67 barrios populares de Tigre del Registro Nacional de Barrios Populares (RENABAP, base 2023 con 6.467 barrios en el país). Además de los campos originales, trae categorías resumidas de luz, agua y cloaca y la cantidad de esos servicios que llegan por red. En `radios_censales.geojson`, `renabap_pct` es la parte de cada radio ocupada por barrios populares y `renabap_fam` reparte las familias de cada barrio según la superficie compartida.
 
 - `valor_suelo.geojson`: mapa de valor del suelo en hexágonos de 500 m (de lado a lado), a partir del Monitor del Mercado Inmobiliario de Tigre, Edición N°2, corte 1/9/2026. Cada celda resume al menos 5 avisos de venta y trae la mediana ponderada de USD/m², el rango habitual, la cantidad de avisos y la diferencia con la mediana del partido. Se descartaron los avisos con coordenadas genéricas (10 o más en el mismo punto) y los que caen fuera de Tigre.

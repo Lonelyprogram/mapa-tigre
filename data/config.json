@@ -79,6 +79,61 @@
       }
     },
     {
+      "id": "parcelas",
+      "nombre": "Parcelario (ARBA)",
+      "grupo": "Desarrollo urbano",
+      "tipo": "teselas",
+      "plantilla": "data/parcelas/{z}/{x}/{y}.geojson",
+      "zoomTeselas": 15,
+      "zoomMinimo": 16,
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "partida",
+      "ordenMapa": 70,
+      "fuente": "ARBA, parcelario del partido de Tigre (110.101). Son 103.806 parcelas: el mapa las carga por zonas a medida que te acercás.",
+      "estilo": {
+        "color": "#8A7A63",
+        "relleno": "#C9BCA3",
+        "opacidadRelleno": 0.25,
+        "grosor": 0.5
+      },
+      "campos": {
+        "partida": "Partida",
+        "cca": "Nomenclatura catastral",
+        "tipo": "Tipo",
+        "sup_m2": "Superficie (m²)"
+      }
+    },
+    {
+      "id": "manzanas",
+      "nombre": "Manzanas",
+      "grupo": "Desarrollo urbano",
+      "archivo": "data/manzanas.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "cca",
+      "ordenMapa": 75,
+      "fuente": "ARBA, manzanas del parcelario del partido de Tigre.",
+      "estilo": {
+        "color": "#8A7A63",
+        "grosor": 0.8,
+        "soloBorde": true
+      },
+      "campos": {
+        "cca": "Nomenclatura catastral",
+        "sup_m2": "Superficie (m²)",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "sup_m2",
+          "nombre": "Superficie de la manzana",
+          "unidad": "m²",
+          "decimales": 0
+        }
+      ]
+    },
+    {
       "id": "barrios_populares",
       "nombre": "Barrios populares (RENABAP)",
       "grupo": "Desarrollo urbano",

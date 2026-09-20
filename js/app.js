@@ -273,11 +273,10 @@
     mapa.createPane("lineas").style.zIndex = 420;
     mapa.createPane("puntos").style.zIndex = 430;
     mapa.createPane("prueba").style.zIndex = 440;
-    // los puntos se dibujan en canvas: miles de marcadores sin trabar el navegador
-    estado.lienzo = L.canvas({ pane: "puntos", padding: 0.3 });
 
     mapa.on("click", () => cerrarFicha());
     mapa.on("moveend", guardarEnUrl);
+    mapa.on("moveend zoomend", actualizarTeselas);
     return mapa;
   }
 
@@ -288,6 +287,22 @@
   async function cargarCapa(def) {
     const registro = { def, datos: null, capa: null, stats: {}, error: null };
     estado.capas.set(def.id, registro);
+    if (def.tipo === "teselas") {
+      // capa partida en teselas: se carga sola al acercar el mapa
+      registro.datos = { type: "FeatureCollection", features: [] };
+      registro.teselas = new Map();
+      registro.capa = L.geoJSON(null, {
+        pane: paneDe(def),
+        style: (f) => estiloElemento(def, f),
+        pointToLayer: (f, ll) => L.circleMarker(ll, { ...estiloElemento(def, f), pane: "puntos" }),
+        onEachFeature: (f, l) => {
+          l.on("click", (e) => { L.DomEvent.stopPropagation(e); seleccionar(def.id, l); });
+          const t = tituloDe(def, f);
+          if (t) l.bindTooltip(escapar(t), { sticky: true, direction: "top", opacity: 0.95 });
+        }
+      });
+      return registro;
+    }
     try {
       const r = await fetch(def.archivo, { cache: "no-cache" });
       if (!r.ok) throw new Error(`respuesta ${r.status}`);
@@ -297,7 +312,7 @@
       registro.capa = L.geoJSON(registro.datos, {
         pane: paneDe(def),
         style: (f) => estiloElemento(def, f),
-        pointToLayer: (f, ll) => L.circleMarker(ll, { ...estiloElemento(def, f), pane: "puntos", renderer: estado.lienzo }),
+        pointToLayer: (f, ll) => L.circleMarker(ll, { ...estiloElemento(def, f), pane: "puntos" }),
         onEachFeature: (f, l) => {
           l.on("click", (e) => { L.DomEvent.stopPropagation(e); seleccionar(def.id, l); });
           const t = tituloDe(def, f);
@@ -332,6 +347,62 @@
     });
   }
 
+  // ---------- capas en teselas ----------
+  function teselasEnVista(def) {
+    const z = def.zoomTeselas;
+    const n = 2 ** z;
+    const b = estado.mapa.getBounds().pad(0.15);
+    const aX = (lng) => Math.floor(((lng + 180) / 360) * n);
+    const aY = (lat) => {
+      const r = (lat * Math.PI) / 180;
+      return Math.floor(((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2) * n);
+    };
+    const x0 = aX(b.getWest()), x1 = aX(b.getEast());
+    const y0 = aY(b.getNorth()), y1 = aY(b.getSouth());
+    const lista = [];
+    for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) lista.push([x, y]);
+    return lista;
+  }
+
+  async function actualizarTeselas() {
+    for (const def of estado.config.capas.filter((d) => d.tipo === "teselas")) {
+      const reg = estado.capas.get(def.id);
+      if (!reg || !reg.capa || !estado.mapa.hasLayer(reg.capa)) continue;
+      if (estado.mapa.getZoom() < (def.zoomMinimo ?? 16)) {
+        if (reg.teselas.size) {
+          reg.capa.clearLayers();
+          reg.teselas.clear();
+          reg.datos.features = [];
+        }
+        avisar(`Acercá el mapa para ver la capa ${def.nombre}.`);
+        continue;
+      }
+      if ($("aviso").textContent.startsWith("Acercá")) avisar("");
+      const vista = teselasEnVista(def);
+      // si hay demasiadas teselas cargadas, se limpia y se vuelve a cargar lo que se ve
+      if (reg.teselas.size > 80) {
+        reg.capa.clearLayers();
+        reg.teselas.clear();
+        reg.datos.features = [];
+      }
+      for (const [x, y] of vista) {
+        const clave = `${x}/${y}`;
+        if (reg.teselas.has(clave)) continue;
+        reg.teselas.set(clave, true);
+        const url = def.plantilla.replace("{z}", def.zoomTeselas).replace("{x}", x).replace("{y}", y);
+        try {
+          const r = await fetch(url, { cache: "force-cache" });
+          if (!r.ok) continue;            // tesela sin datos
+          const datos = await r.json();
+          if (!estado.mapa.hasLayer(reg.capa)) return;
+          reg.capa.addData(datos);
+          reg.datos.features.push(...datos.features);
+          ordenarCapas();
+        } catch (err) { /* sin datos en esa tesela */ }
+      }
+    }
+  }
+
   // ---------- lista de capas ----------
   function dibujarListaCapas() {
     const cont = $("listaCapas");
@@ -358,9 +429,9 @@
         fila.innerHTML = `
           <input type="checkbox" id="${idc}" ${reg.capa && estado.mapa.hasLayer(reg.capa) ? "checked" : ""} ${reg.error ? "disabled" : ""}>
           <span class="muestra ${tipoMuestra}${multicolor ? " multicolor" : ""}" style="${multicolor ? "" : `border-color:${b.color};background:${fondo}`}"></span>
-          <label for="${idc}">${escapar(def.nombre)}</label>
-          ${reg.error ? "" : `<span class="descargas"><a href="${escapar(def.archivo)}" download title="Descargar ${escapar(def.nombre)} como GeoJSON, para usar en QGIS">GeoJSON</a>
-            <button type="button" class="enlace" data-csv="${escapar(def.id)}" title="Descargar la tabla de datos de ${escapar(def.nombre)} en CSV, para abrir en Excel">CSV</button></span>`}
+          <label for="${idc}">${escapar(def.nombre)}${def.tipo === "teselas" ? ` <small>(al acercar)</small>` : ""}</label>
+          ${reg.error ? "" : `<span class="descargas">${def.archivo ? `<a href="${escapar(def.archivo)}" download title="Descargar ${escapar(def.nombre)} como GeoJSON, para usar en QGIS">GeoJSON</a>` : ""}
+            <button type="button" class="enlace" data-csv="${escapar(def.id)}" title="${def.tipo === "teselas" ? "Descargar en CSV lo que está cargado en pantalla" : `Descargar la tabla de datos de ${escapar(def.nombre)} en CSV, para abrir en Excel`}">CSV</button></span>`}
           ${reg.error ? `<span class="error">${escapar(reg.error)}</span>` : ""}`;
         const btn = fila.querySelector("button[data-csv]");
         if (btn) btn.addEventListener("click", () => descargarCsv(def.id));
@@ -401,7 +472,7 @@
   function alternarCapa(id, visible) {
     const reg = estado.capas.get(id);
     if (!reg || !reg.capa) return;
-    if (visible) { reg.capa.addTo(estado.mapa); ordenarCapas(); }
+    if (visible) { reg.capa.addTo(estado.mapa); ordenarCapas(); if (reg.def.tipo === "teselas") actualizarTeselas(); }
     else {
       estado.mapa.removeLayer(reg.capa);
       if (estado.seleccion && estado.seleccion.id === id) cerrarFicha();

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Código de zonificación · Geoportal de Tigre</title>
+  <meta name="description" content="Indicadores urbanos por zona del Código de Zonificación del Partido de Tigre: F.O.S., F.O.T., densidad, lote mínimo, retiros y alturas.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body class="pagina">
+  <header class="barra">
+    <a class="marca" href="./" aria-label="IDEAR Tigre, inicio">
+      <img src="logo-idear.jpeg" alt="" onerror="this.remove()">
+      <span class="marca-texto">IDEAR<strong>TIGRE</strong></span>
+    </a>
+    <nav class="barra-nav" aria-label="Secciones">
+      <a href="./">Geoportal</a>
+      <a href="zonificacion.html" aria-current="page">Código de zonificación</a>
+    </nav>
+  </header>
+
+  <main class="hoja">
+    <h1>Código de zonificación</h1>
+    <p class="entrada" id="referencia"></p>
+    <p class="advertencia" id="advertencia"></p>
+
+    <div class="controles">
+      <div class="campo">
+        <label for="buscar">Buscar zona</label>
+        <input id="buscar" type="search" placeholder="Por ejemplo: R1u, industrial, Remeros" autocomplete="off">
+      </div>
+      <div class="campo">
+        <label for="familia">Tipo de área</label>
+        <select id="familia"><option value="">Todas</option></select>
+      </div>
+      <div class="campo">
+        <label for="orden">Ordenar por</label>
+        <select id="orden">
+          <option value="codigo">Código</option>
+          <option value="fot">F.O.T., de mayor a menor</option>
+          <option value="densidad">Densidad, de mayor a menor</option>
+          <option value="superficie">Lote mínimo, de mayor a menor</option>
+        </select>
+      </div>
+      <button type="button" class="boton" id="verTabla">Ver como tabla</button>
+    </div>
+
+    <p class="conteo" id="conteo"></p>
+    <div id="zonas" class="zonas"></div>
+    <div id="tabla" class="tabla-envoltura" hidden></div>
+
+    <footer class="pie-pagina">
+      <p>Los indicadores salen de las planillas de indicadores urbanos publicadas por el Municipio de Tigre. Las alturas máximas vigentes surgen de la Ordenanza 4448/26, que fija límites por sector dentro de cada zona.</p>
+      <p>Falta lo principal para completar esta sección: el plano de zonificación en formato SIG. Con ese archivo, cada parcela del mapa queda pintada según su zona y esta ficha se abre desde el mapa.</p>
+    </footer>
+  </main>
+
+  <script src="js/zonificacion.js"></script>
+</body>
+</html>
