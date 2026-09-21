@@ -1306,5 +1306,9 @@
       ],
       "ordenMapa": 90
     }
-  ]
+  ],
+  "aportes": {
+    "correo": "ideartigre@gmail.com",
+    "asunto": "Nuevo aporte al Geoportal de Tigre"
+  }
 }
