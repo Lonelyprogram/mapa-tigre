@@ -123,6 +123,12 @@ python -m http.server 8000
 
 y abrir `http://localhost:8000`.
 
+## Dar mi aporte
+
+El botón del panel abre un formulario (tipo de aporte, capa relacionada, comentario, archivo de hasta 10 MB y, si la persona quiere, la vista del mapa que estaba mirando). Lo envía el servicio gratuito FormSubmit al correo configurado en `config.json`, en `"aportes": {"correo": "..."}`.
+
+La primera vez que alguien envía el formulario, FormSubmit manda un correo de activación a esa casilla: hay que abrirlo y confirmar. Después de activarlo, FormSubmit ofrece un código que reemplaza al correo; conviene ponerlo en `"correo"` para que la dirección no quede visible en el sitio.
+
 ## Cómo carga el sitio
 
 Al abrir, el sitio trae solo las capas que arrancan encendidas (unos 50 KB). El resto se descarga en segundo plano, sin frenar el mapa, y cualquier capa que se prenda antes de estar lista se trae en el momento. En `config.json`, `"soloAlPrender": true` excluye una capa de esa carga en segundo plano: conviene para las pesadas, como las manzanas. Con ahorro de datos activado o conexión lenta, todas las capas esperan a que las prendan.

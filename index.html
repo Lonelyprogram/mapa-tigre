@@ -33,6 +33,11 @@
         <button class="boton-panel-cerrar" id="cerrarPanel" type="button" aria-label="Ocultar panel">Ver mapa</button>
       </header>
 
+      <div class="aporte-caja">
+        <button type="button" class="boton-aporte" id="abrirAporte">Dar mi aporte</button>
+        <p>Un mapa que hacemos entre todos para planificar mejor Tigre.</p>
+      </div>
+
       <div class="buscador">
         <label for="busqueda" class="visualmente-oculto">Buscar en el mapa</label>
         <input id="busqueda" type="search" placeholder="Buscar un lugar o zona" autocomplete="off"
@@ -85,6 +90,64 @@
       <button class="boton-panel-abrir" id="abrirPanel" type="button" aria-controls="panel">Capas y datos</button>
     </main>
   </div>
+
+  <dialog id="dialogoAporte" class="dialogo" aria-labelledby="t-aporte">
+    <form id="formAporte" method="POST" enctype="multipart/form-data">
+      <header>
+        <h2 id="t-aporte">Dar mi aporte</h2>
+        <button type="button" class="ficha-cerrar" id="cerrarAporte" aria-label="Cerrar">×</button>
+      </header>
+      <p class="nota">Este es un mapa que hacemos entre todos para planificar mejor Tigre. Contanos qué falta, qué está mal o qué dato tenés. Si tenés una base de datos, adjuntala.</p>
+
+      <div class="campo">
+        <label for="aporteTipo">¿Qué querés aportar?</label>
+        <select id="aporteTipo" name="Tipo de aporte" required>
+          <option value="Corrección de un dato">Corregir un dato del mapa</option>
+          <option value="Nueva capa o base de datos">Sumar una capa o una base de datos</option>
+          <option value="Sugerencia">Una sugerencia o idea</option>
+          <option value="Otro">Otra cosa</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label for="aporteCapa">Capa relacionada <small>(opcional)</small></label>
+        <select id="aporteCapa" name="Capa relacionada"><option value="">Ninguna en particular</option></select>
+      </div>
+      <div class="campo">
+        <label for="aporteMensaje">Tu comentario</label>
+        <textarea id="aporteMensaje" name="Comentario" rows="5" required placeholder="Por ejemplo: la plaza de la calle Italia tiene otro nombre; o: tengo el listado de clubes de Benavídez."></textarea>
+      </div>
+      <div class="campo">
+        <label for="aporteArchivo">Adjuntar un archivo <small>(opcional, hasta 10 MB)</small></label>
+        <input id="aporteArchivo" type="file" name="archivo"
+          accept=".geojson,.json,.kml,.kmz,.gpkg,.zip,.csv,.xlsx,.xls,.pdf,.jpg,.jpeg,.png">
+        <p class="nota pequena">GeoJSON, KML, GeoPackage, shapefile en .zip, planillas, PDF o fotos.</p>
+      </div>
+      <label class="casilla"><input type="checkbox" id="aporteVista" checked> Incluir la zona del mapa que estoy mirando</label>
+      <div class="campo-doble">
+        <div class="campo">
+          <label for="aporteNombre">Tu nombre <small>(opcional)</small></label>
+          <input id="aporteNombre" type="text" name="Nombre" autocomplete="name">
+        </div>
+        <div class="campo">
+          <label for="aporteCorreo">Tu correo <small>(opcional, para responderte)</small></label>
+          <input id="aporteCorreo" type="email" name="email" autocomplete="email">
+        </div>
+      </div>
+
+      <input type="hidden" name="_subject" id="aporteAsunto">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" id="aporteSiguiente">
+      <input type="hidden" name="Vista del mapa" id="aporteLink">
+      <input type="text" name="_honey" class="visualmente-oculto" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+      <p id="aporteError" class="alerta-form" role="alert" hidden></p>
+      <div class="acciones-dialogo">
+        <button type="button" class="boton" id="cancelarAporte">Cancelar</button>
+        <button type="submit" class="boton boton-principal" id="enviarAporte">Enviar aporte</button>
+      </div>
+    </form>
+  </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script src="js/app.js"></script>
