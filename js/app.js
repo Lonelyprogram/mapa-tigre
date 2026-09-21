@@ -304,15 +304,16 @@
   function flechaDe(def, feature, ll) {
     const ang = Number(feature.properties[def.estilo.flecha]) || 0;
     const color = def.estilo.relleno || "#16525A";
+    const t = def.estilo.tamano || 18;
     return L.marker(ll, {
       pane: "puntos",
       interactive: false,
       keyboard: false,
       icon: L.divIcon({
         className: "flecha",
-        iconSize: [18, 18],
-        html: `<svg viewBox="0 0 24 24" style="transform:rotate(${ang}deg)" aria-hidden="true">
-          <path d="M12 2 L18 20 L12 16 L6 20 Z" fill="${color}"/></svg>`
+        iconSize: [t, t],
+        html: `<svg viewBox="0 0 24 24" width="${t}" height="${t}" style="transform:rotate(${ang}deg)" aria-hidden="true">
+          <path d="M12 2 L18 20 L12 16 L6 20 Z" fill="${color}" stroke="#FFFFFF" stroke-width="1.5" stroke-linejoin="round"/></svg>`
       })
     });
   }
@@ -525,6 +526,11 @@
         chk.addEventListener("change", () => alternarCapa(def.id, chk.checked));
         div.appendChild(fila);
       });
+      const extras = (estado.config.enlacesGrupo || {})[nombre] || [];
+      extras.forEach((e) => {
+        div.insertAdjacentHTML("beforeend",
+          `<a class="enlace-grupo" href="${escapar(e.url)}"${e.nuevaPestana ? ' target="_blank" rel="noopener"' : ""}>${escapar(e.texto)}<span aria-hidden="true">→</span></a>`);
+      });
       cont.appendChild(div);
     });
   }
@@ -650,7 +656,8 @@
       const ops = vs.map((v) => `<option value="${escapar(claveVar(v))}">${escapar(v.nombre)}</option>`).join("");
       return g ? `<optgroup label="${escapar(g)}">${ops}</optgroup>` : ops;
     }).join("");
-    $("fuenteVariable").textContent = def.fuente ? `Fuente: ${def.fuente}` : "";
+    $("fuenteVariable").innerHTML = (def.fuente ? `Fuente: ${escapar(def.fuente)}` : "") +
+      (def.enlace ? ` <a href="${escapar(def.enlace.url)}" target="_blank" rel="noopener">${escapar(def.enlace.texto)} ↗</a>` : "");
     const existe = clave && def.variables.some((v) => claveVar(v) === clave);
     elegirVariable(existe ? clave : claveVar(def.variables[0]), anio, rango);
   }
@@ -879,10 +886,11 @@
         }).join("") + `</div>`;
     }
 
+    const enlace = def.enlace ? `<p class="enlace-ficha"><a href="${escapar(def.enlace.url)}" target="_blank" rel="noopener">${escapar(def.enlace.texto)} ↗</a></p>` : "";
     $("fichaContenido").innerHTML = `
       <h2>${escapar(tituloDe(def, l.feature) || def.nombre)}</h2>
       <p class="capa-origen">${escapar(def.nombre)}</p>
-      <dl>${filas}</dl>${comparacion}`;
+      <dl>${filas}</dl>${comparacion}${enlace}`;
     $("ficha").hidden = false;
   }
   function cerrarFicha() {
