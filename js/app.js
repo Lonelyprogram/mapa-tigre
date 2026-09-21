@@ -24,7 +24,8 @@
   };
 
   // ---------- utilidades ----------
-  const normalizar = (s) => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const normalizar = (s) => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+    .replace(/[^a-z0-9ñ]+/g, " ").replace(/\s+/g, " ").trim();
   const esNumero = (v) => v !== null && v !== "" && isFinite(Number(v));
   const escapar = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -945,8 +946,11 @@
     input.addEventListener("input", () => {
       const q = normalizar(input.value.trim());
       if (q.length < 2) return cerrar();
-      actual = estado.indiceBusqueda.filter((r) => r.norm.includes(q))
-        .sort((a, b) => a.norm.indexOf(q) - b.norm.indexOf(q)).slice(0, 8);
+      // todas las palabras tienen que aparecer, en cualquier orden; primero las que coinciden de corrido
+      const palabras = q.split(" ");
+      const puntaje = (r) => (r.norm.includes(q) ? 0 : 1000) + r.norm.indexOf(palabras[0]);
+      actual = estado.indiceBusqueda.filter((r) => palabras.every((p) => r.norm.includes(p)))
+        .sort((a, b) => puntaje(a) - puntaje(b)).slice(0, 8);
       activo = -1;
       pintar();
     });
