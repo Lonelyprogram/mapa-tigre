@@ -89,7 +89,9 @@
         "cloaca_2022": "Hogares con cloaca (%)",
         "sec_2022": "Secundario completo o más (%)",
         "sincob_2022": "Sin cobertura de salud (%)",
-        "renabap_fam": "Familias en barrios populares"
+        "renabap_fam": "Familias en barrios populares",
+        "uc_cant": "Urbanizaciones cerradas",
+        "uc_pct": "Superficie en urbanizaciones cerradas (%)"
       },
       "variables": [
         {
@@ -158,6 +160,13 @@
           "grupo": "Condiciones de vida",
           "nombre": "Familias en barrios populares",
           "decimales": 0
+        },
+        {
+          "campo": "uc_pct",
+          "grupo": "Desarrollo urbano",
+          "nombre": "Superficie en urbanizaciones cerradas",
+          "unidad": "%",
+          "decimales": 1
         }
       ],
       "etiquetaFija": true,
@@ -180,10 +189,10 @@
       "ordenMapa": 70,
       "fuente": "ARBA, parcelario del partido de Tigre (110.101). Son 103.806 parcelas: el mapa las carga por zonas a medida que te acercás.",
       "estilo": {
-        "color": "#8A7A63",
+        "color": "#5E4B32",
         "relleno": "#C9BCA3",
-        "opacidadRelleno": 0.25,
-        "grosor": 0.5
+        "opacidadRelleno": 0.22,
+        "grosor": 1.1
       },
       "campos": {
         "partida": "Partida",
@@ -203,8 +212,8 @@
       "ordenMapa": 75,
       "fuente": "ARBA, manzanas del parcelario del partido de Tigre.",
       "estilo": {
-        "color": "#8A7A63",
-        "grosor": 0.8,
+        "color": "#5E4B32",
+        "grosor": 1.4,
         "soloBorde": true
       },
       "campos": {
@@ -340,6 +349,42 @@
       ]
     },
     {
+      "id": "urbanizaciones",
+      "nombre": "Urbanizaciones cerradas",
+      "grupo": "Desarrollo urbano",
+      "archivo": "data/urbanizaciones_cerradas.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "ordenMapa": 80,
+      "fuente": "Relevamiento de urbanizaciones cerradas 2022 del partido de Tigre, sobre polígonos colaborativos de Wikimapia. La superficie y la localidad se calcularon sobre la geometría.",
+      "estilo": {
+        "color": "#3F5D7D",
+        "relleno": "#6E8FB5",
+        "opacidadRelleno": 0.35,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Urbanización",
+        "localidad": "Localidad",
+        "sup_ha": "Superficie (ha)"
+      },
+      "variables": [
+        {
+          "campo": "sup_ha",
+          "nombre": "Superficie",
+          "unidad": "ha",
+          "decimales": 1
+        },
+        {
+          "campo": "localidad",
+          "nombre": "Localidad",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
       "id": "region",
       "nombre": "Municipios limítrofes",
       "grupo": "Desarrollo urbano",
@@ -465,82 +510,6 @@
       "ordenMapa": 95
     },
     {
-      "id": "cuencas",
-      "nombre": "Cuencas hídricas",
-      "grupo": "Riesgo hídrico",
-      "archivo": "data/cuencas.geojson",
-      "geometria": "poligono",
-      "visible": false,
-      "titulo": "nombre",
-      "busqueda": "nombre",
-      "ordenMapa": 88,
-      "fuente": "COHIFE, vía IGN. Recortadas al partido de Tigre.",
-      "estilo": {
-        "color": "#2F6F8F",
-        "relleno": "#6FA8C4",
-        "opacidadRelleno": 0.3,
-        "grosor": 1.2
-      },
-      "campos": {
-        "nombre": "Cuenca",
-        "sistema": "Sistema",
-        "region": "Región hídrica",
-        "sup_km2": "Superficie en Tigre (km²)",
-        "fuente": "Fuente"
-      },
-      "variables": [
-        {
-          "campo": "nombre",
-          "nombre": "Cuenca",
-          "tipo": "categoria"
-        },
-        {
-          "campo": "sup_km2",
-          "nombre": "Superficie en Tigre",
-          "unidad": "km²",
-          "decimales": 1
-        }
-      ]
-    },
-    {
-      "id": "puertos_alerta",
-      "nombre": "Puertos: alturas de alerta",
-      "grupo": "Riesgo hídrico",
-      "archivo": "data/puertos_alerta.geojson",
-      "geometria": "punto",
-      "visible": false,
-      "titulo": "nombre",
-      "busqueda": "nombre",
-      "fuente": "Prefectura Naval Argentina, vía IGN. La cota de alerta es la altura del río a partir de la cual se activan los avisos; la de evacuación, cuando corresponde evacuar la zona ribereña.",
-      "estilo": {
-        "color": "#FFFFFF",
-        "relleno": "#2F6F8F",
-        "radio": 8,
-        "grosor": 1.5
-      },
-      "campos": {
-        "nombre": "Puerto",
-        "alerta_m": "Cota de alerta (m)",
-        "evacuacion_m": "Cota de evacuación (m)",
-        "en_tigre": "Dentro de Tigre",
-        "fuente": "Fuente"
-      },
-      "variables": [
-        {
-          "campo": "alerta_m",
-          "nombre": "Cota de alerta",
-          "unidad": "m",
-          "decimales": 1
-        },
-        {
-          "campo": "evacuacion_m",
-          "nombre": "Cota de evacuación",
-          "unidad": "m",
-          "decimales": 1
-        }
-      ]
-    },
-    {
       "id": "educacion",
       "nombre": "Establecimientos educativos",
       "grupo": "Desarrollo humano",
@@ -554,21 +523,41 @@
         "color": "#FFFFFF",
         "relleno": "#2F6FB0",
         "radio": 5,
-        "grosor": 1.2
+        "grosor": 1.2,
+        "colorSegun": "gestion",
+        "colores": {
+          "Estatal": "#2F6FB0",
+          "Privada": "#D98C3A"
+        }
       },
       "campos": {
         "nombre": "Nombre",
-        "tipo": "Tipo",
+        "gestion": "Gestión",
         "nivel": "Nivel",
+        "tipo": "Tipo",
         "fuente": "Fuente"
       },
       "variables": [
+        {
+          "campo": "gestion",
+          "nombre": "Gestión",
+          "tipo": "categoria",
+          "colores": {
+            "Estatal": "#2F6FB0",
+            "Privada": "#D98C3A"
+          },
+          "descripcion": "Las escuelas estatales bonaerenses llevan número (por ejemplo, «Escuela Primaria N° 12»); se clasificaron por el nombre. Da 200 estatales y 101 privadas, en línea con las más de 180 estatales y alrededor de 100 privadas que informa el Municipio."
+        },
         {
           "campo": "nivel",
           "nombre": "Nivel educativo",
           "tipo": "categoria"
         }
-      ]
+      ],
+      "enlace": {
+        "texto": "Centros educativos del Municipio de Tigre",
+        "url": "https://www.tigre.gob.ar/educacion/centros_educativos"
+      }
     },
     {
       "id": "salud",
@@ -816,7 +805,7 @@
       "fuente": "OpenStreetMap, colaboradores. Recortado al partido de Tigre. El sentido de circulación proviene del campo oneway de OSM y puede estar desactualizado en calles de barrio.",
       "estilo": {
         "color": "#7A8B95",
-        "grosor": 1.6,
+        "grosor": 2.4,
         "opacidad": 0.9,
         "colorSegun": "sentido",
         "colores": {
@@ -862,7 +851,7 @@
       "geometria": "punto",
       "visible": false,
       "soloAlPrender": true,
-      "zoomMinimo": 16,
+      "zoomMinimo": 15,
       "soloEnVista": true,
       "maximoEnVista": 700,
       "ordenMapa": 58,
@@ -870,7 +859,8 @@
       "fuente": "Flechas calculadas sobre las calles de mano única de OpenStreetMap: una cada 150 metros, en la dirección permitida.",
       "estilo": {
         "flecha": "angulo",
-        "relleno": "#C2622C"
+        "relleno": "#C2622C",
+        "tamano": 26
       },
       "campos": {
         "nombre": "Calle"
@@ -976,6 +966,82 @@
           "campo": "tipo",
           "nombre": "Tipo",
           "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "cuencas",
+      "nombre": "Cuencas hídricas",
+      "grupo": "Espacio público",
+      "archivo": "data/cuencas.geojson",
+      "geometria": "poligono",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "ordenMapa": 88,
+      "fuente": "COHIFE, vía IGN. Recortadas al partido de Tigre.",
+      "estilo": {
+        "color": "#2F6F8F",
+        "relleno": "#6FA8C4",
+        "opacidadRelleno": 0.3,
+        "grosor": 1.2
+      },
+      "campos": {
+        "nombre": "Cuenca",
+        "sistema": "Sistema",
+        "region": "Región hídrica",
+        "sup_km2": "Superficie en Tigre (km²)",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "nombre",
+          "nombre": "Cuenca",
+          "tipo": "categoria"
+        },
+        {
+          "campo": "sup_km2",
+          "nombre": "Superficie en Tigre",
+          "unidad": "km²",
+          "decimales": 1
+        }
+      ]
+    },
+    {
+      "id": "puertos_alerta",
+      "nombre": "Puertos: alturas de alerta",
+      "grupo": "Espacio público",
+      "archivo": "data/puertos_alerta.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Prefectura Naval Argentina, vía IGN. La cota de alerta es la altura del río a partir de la cual se activan los avisos; la de evacuación, cuando corresponde evacuar la zona ribereña.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#2F6F8F",
+        "radio": 8,
+        "grosor": 1.5
+      },
+      "campos": {
+        "nombre": "Puerto",
+        "alerta_m": "Cota de alerta (m)",
+        "evacuacion_m": "Cota de evacuación (m)",
+        "en_tigre": "Dentro de Tigre",
+        "fuente": "Fuente"
+      },
+      "variables": [
+        {
+          "campo": "alerta_m",
+          "nombre": "Cota de alerta",
+          "unidad": "m",
+          "decimales": 1
+        },
+        {
+          "campo": "evacuacion_m",
+          "nombre": "Cota de evacuación",
+          "unidad": "m",
+          "decimales": 1
         }
       ]
     },
@@ -1302,6 +1368,14 @@
           "decimales": 0,
           "descripcion": "Estimación: las familias de cada barrio se reparten entre los radios según la superficie que comparten.",
           "cortes": [0.5, 50, 150, 400]
+        },
+        {
+          "campo": "uc_pct",
+          "grupo": "Barrios populares",
+          "nombre": "Superficie en urbanizaciones cerradas",
+          "unidad": "%",
+          "decimales": 1,
+          "cortes": [0.1, 10, 25, 50]
         }
       ],
       "ordenMapa": 90
@@ -1310,5 +1384,13 @@
   "aportes": {
     "correo": "ideartigre@gmail.com",
     "asunto": "Nuevo aporte al Geoportal de Tigre"
+  },
+  "enlacesGrupo": {
+    "Movilidad": [
+      {
+        "texto": "Tránsito en vivo",
+        "url": "transito.html"
+      }
+    ]
   }
 }
