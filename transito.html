@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tránsito en vivo · Geoportal de Tigre</title>
+  <meta name="description" content="Tránsito en tiempo real en el partido de Tigre: congestión, cortes y accidentes reportados en Waze.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body class="pagina">
+  <header class="barra">
+    <a class="marca" href="./" aria-label="IDEAR Tigre, inicio">
+      <img src="logo-idear.jpeg" alt="" onerror="this.remove()">
+      <span class="marca-texto">IDEAR<strong>TIGRE</strong></span>
+    </a>
+    <nav class="barra-nav" aria-label="Secciones">
+      <a href="./">Geoportal</a>
+      <a href="transito.html" aria-current="page">Tránsito en vivo</a>
+      <a href="zonificacion.html">Código de zonificación</a>
+    </nav>
+  </header>
+
+  <main class="transito">
+    <div class="transito-cabecera">
+      <h1>Tránsito en vivo</h1>
+      <p>Congestión, cortes, obras y accidentes reportados en tiempo real por los usuarios de Waze. Elegí una zona para acercarte.</p>
+      <div class="saltos" id="saltos" role="group" aria-label="Ir a una zona"></div>
+    </div>
+    <iframe id="waze" class="marco-waze" title="Mapa de tránsito en vivo de Waze, centrado en Tigre"
+      src="https://embed.waze.com/es/iframe?zoom=12&lat=-34.4300&lon=-58.6200"
+      allowfullscreen loading="lazy"></iframe>
+  </main>
+
+  <script>
+    // Zonas para acercar el mapa de Waze: el partido completo y los principales accesos
+    const zonas = [
+      { nombre: "Todo el partido", lat: -34.4300, lon: -58.6200, zoom: 12 },
+      { nombre: "Tigre centro", lat: -34.4253, lon: -58.5797, zoom: 15 },
+      { nombre: "Panamericana y Ruta 197", lat: -34.4695, lon: -58.6490, zoom: 14 },
+      { nombre: "Nordelta", lat: -34.4057, lon: -58.6425, zoom: 14 },
+      { nombre: "Benavídez", lat: -34.4128, lon: -58.6936, zoom: 14 },
+      { nombre: "General Pacheco", lat: -34.4585, lon: -58.6392, zoom: 14 },
+      { nombre: "Don Torcuato", lat: -34.4930, lon: -58.6260, zoom: 14 },
+      { nombre: "El Talar", lat: -34.4660, lon: -58.6660, zoom: 14 },
+      { nombre: "Rincón de Milberg", lat: -34.4060, lon: -58.6070, zoom: 14 }
+    ];
+    const marco = document.getElementById("waze");
+    const cont = document.getElementById("saltos");
+    zonas.forEach((z, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = z.nombre;
+      b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
+      b.addEventListener("click", () => {
+        marco.src = `https://embed.waze.com/es/iframe?zoom=${z.zoom}&lat=${z.lat}&lon=${z.lon}`;
+        cont.querySelectorAll("button").forEach((o) => o.setAttribute("aria-pressed", o === b ? "true" : "false"));
+      });
+      cont.appendChild(b);
+    });
+  </script>
+</body>
+</html>

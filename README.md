@@ -123,6 +123,10 @@ python -m http.server 8000
 
 y abrir `http://localhost:8000`.
 
+## Tránsito en vivo
+
+`transito.html` muestra el mapa en vivo de Waze (congestión, cortes, obras y accidentes) centrado en Tigre, con botones para acercarse a cada zona. Es el mapa oficial de Waze insertado tal cual: sus condiciones de uso no permiten superponerlo con otros mapas, por eso va en una página propia y no como capa del geoportal. En el panel se llega desde el enlace "Tránsito en vivo" del grupo Movilidad (se configura en `enlacesGrupo` de `config.json`).
+
 ## Dar mi aporte
 
 El botón del panel abre un formulario (tipo de aporte, capa relacionada, comentario, archivo de hasta 10 MB y, si la persona quiere, la vista del mapa que estaba mirando). Lo envía el servicio gratuito FormSubmit al correo configurado en `config.json`, en `"aportes": {"correo": "..."}`.
@@ -156,6 +160,8 @@ Falta el plano de zonificación en formato SIG. Cuando esté, se suma como capa 
 - `tigre_limite.geojson`: límite del partido de Tigre (ARBA, vía IGN).
 - Equipamiento y servicios del IGN: `educacion`, `salud`, `seguridad`, `bomberos`, `cultura`, `deporte`, `culto`, `estaciones_servicio`, `reciclaje`, `espacios_verdes` y `areas_industriales`. Los archivos originales tenían los acentos dañados (se habían guardado con otra codificación); se repararon con un diccionario de español y una lista revisada a mano de nombres propios. Conviene corregir en origen cualquier nombre que haya quedado mal.
 - Transporte: `estaciones_tren`, `ferrocarril` y `rutas` (IGN) y `colectivos` (recorridos nacionales, provinciales y municipales).
+- `urbanizaciones_cerradas.geojson`: 107 urbanizaciones cerradas (relevamiento 2022 sobre polígonos de Wikimapia), con localidad y superficie. Las localidades y los radios censales traen además el porcentaje de su superficie ocupado por urbanizaciones cerradas.
+- En `educacion.geojson`, el campo `gestion` distingue estatal y privada por el nombre: las escuelas estatales bonaerenses llevan número.
 - `calles.geojson` y `sentido_flechas.geojson`: callejero de OpenStreetMap recortado a Tigre, con una línea por calle (nombre, tipo, sentido y largo) y las flechas de las calles de mano única, una cada 150 metros. En OSM el sentido puede venir marcado al revés (`oneway=-1`); esas geometrías se invierten al procesar para que las flechas apunten bien.
 - `localidades.geojson`: punto de referencia de cada localidad según INDEC.
 - `region_partidos.geojson`: Tigre y partidos limítrofes, con superficie, perímetro y compacidad (índice de Polsby-Popper) calculados en POSGAR 2007 faja 5.
