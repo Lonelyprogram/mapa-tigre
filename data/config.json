@@ -598,22 +598,45 @@
       "visible": false,
       "titulo": "nombre",
       "busqueda": "nombre",
-      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "fuente": "Relevamiento del equipo de IDEAR Tigre, completado con las capas del IGN para lo que no estaba en la planilla. La localidad se asignó según la ubicación de cada punto.",
       "estilo": {
         "color": "#FFFFFF",
         "relleno": "#8E44AD",
         "radio": 7,
-        "grosor": 1.2
+        "grosor": 1.5,
+        "colorSegun": "categoria",
+        "colores": {
+          "Museo": "#8E44AD",
+          "Teatro": "#C0392B",
+          "Cine": "#D98C3A",
+          "Biblioteca": "#2F6FB0",
+          "Centro cultural": "#27AE60"
+        }
       },
       "campos": {
         "nombre": "Nombre",
-        "tipo": "Tipo",
+        "categoria": "Tipo",
+        "direccion": "Dirección",
+        "localidad": "Localidad",
+        "descripcion": "Detalle",
         "fuente": "Fuente"
       },
       "variables": [
         {
           "campo": "categoria",
-          "nombre": "Tipo de institución",
+          "nombre": "Tipo",
+          "tipo": "categoria",
+          "colores": {
+            "Museo": "#8E44AD",
+            "Teatro": "#C0392B",
+            "Cine": "#D98C3A",
+            "Biblioteca": "#2F6FB0",
+            "Centro cultural": "#27AE60"
+          }
+        },
+        {
+          "campo": "localidad",
+          "nombre": "Localidad",
           "tipo": "categoria"
         }
       ]
@@ -627,22 +650,47 @@
       "visible": false,
       "titulo": "nombre",
       "busqueda": "nombre",
-      "fuente": "Instituto Geográfico Nacional (capas SIG). La fuente de cada elemento figura en su ficha.",
+      "fuente": "Relevamiento del equipo de IDEAR Tigre, completado con las capas del IGN para lo que no estaba en la planilla. La localidad se asignó según la ubicación de cada punto.",
       "estilo": {
         "color": "#FFFFFF",
         "relleno": "#27AE60",
         "radio": 7,
-        "grosor": 1.2
+        "grosor": 1.5,
+        "colorSegun": "tipo",
+        "colores": {
+          "Club de remo": "#2F6F8F",
+          "Rugby y hockey": "#6F8A3E",
+          "Club de fútbol": "#27AE60",
+          "Club social y deportivo": "#D98C3A",
+          "Polideportivo municipal": "#C0392B",
+          "Club de urbanización cerrada": "#7F8C8D"
+        }
       },
       "campos": {
         "nombre": "Nombre",
         "tipo": "Tipo",
+        "direccion": "Dirección",
+        "localidad": "Localidad",
+        "descripcion": "Detalle",
         "fuente": "Fuente"
       },
       "variables": [
         {
           "campo": "tipo",
-          "nombre": "Tipo",
+          "nombre": "Tipo de club",
+          "tipo": "categoria",
+          "colores": {
+            "Club de remo": "#2F6F8F",
+            "Rugby y hockey": "#6F8A3E",
+            "Club de fútbol": "#27AE60",
+            "Club social y deportivo": "#D98C3A",
+            "Polideportivo municipal": "#C0392B",
+            "Club de urbanización cerrada": "#7F8C8D"
+          }
+        },
+        {
+          "campo": "localidad",
+          "nombre": "Localidad",
           "tipo": "categoria"
         }
       ]
@@ -673,6 +721,59 @@
         {
           "campo": "culto",
           "nombre": "Culto",
+          "tipo": "categoria"
+        }
+      ]
+    },
+    {
+      "id": "organizaciones",
+      "nombre": "Organizaciones sociales",
+      "grupo": "Desarrollo humano",
+      "archivo": "data/organizaciones_sociales.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Relevamiento del equipo de IDEAR Tigre. La localidad se asignó según la ubicación de cada organización.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#8E44AD",
+        "radio": 7,
+        "grosor": 1.5,
+        "colorSegun": "tipo",
+        "colores": {
+          "Fundación": "#8E44AD",
+          "Asociación civil": "#2F6FB0",
+          "Nutrición infantil (CONIN)": "#C0392B",
+          "Centro de integración social": "#27AE60",
+          "Escuela y formación": "#D98C3A",
+          "Otras organizaciones": "#7F8C8D"
+        }
+      },
+      "campos": {
+        "nombre": "Organización",
+        "tipo": "Tipo",
+        "direccion": "Dirección",
+        "localidad": "Localidad",
+        "descripcion": "Detalle"
+      },
+      "variables": [
+        {
+          "campo": "tipo",
+          "nombre": "Tipo de organización",
+          "tipo": "categoria",
+          "colores": {
+            "Fundación": "#8E44AD",
+            "Asociación civil": "#2F6FB0",
+            "Nutrición infantil (CONIN)": "#C0392B",
+            "Centro de integración social": "#27AE60",
+            "Escuela y formación": "#D98C3A",
+            "Otras organizaciones": "#7F8C8D"
+          }
+        },
+        {
+          "campo": "localidad",
+          "nombre": "Localidad",
           "tipo": "categoria"
         }
       ]
@@ -727,6 +828,94 @@
         "tipo": "Tipo",
         "fuente": "Fuente"
       }
+    },
+    {
+      "id": "justicia",
+      "nombre": "Juzgados y fiscalías",
+      "grupo": "Seguridad",
+      "archivo": "data/justicia.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Relevamiento del equipo de IDEAR Tigre.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#34495E",
+        "radio": 8,
+        "grosor": 1.5,
+        "colorSegun": "tipo",
+        "colores": {
+          "Fiscalía": "#34495E",
+          "Juzgado": "#8A6D3B"
+        }
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "tipo": "Tipo",
+        "direccion": "Dirección",
+        "localidad": "Localidad",
+        "descripcion": "Detalle"
+      },
+      "variables": [
+        {
+          "campo": "tipo",
+          "nombre": "Tipo",
+          "tipo": "categoria",
+          "colores": {
+            "Fiscalía": "#34495E",
+            "Juzgado": "#8A6D3B"
+          }
+        }
+      ]
+    },
+    {
+      "id": "organismos",
+      "nombre": "Organismos públicos y delegaciones",
+      "grupo": "Organismos públicos",
+      "archivo": "data/organismos_publicos.geojson",
+      "geometria": "punto",
+      "visible": false,
+      "titulo": "nombre",
+      "busqueda": "nombre",
+      "fuente": "Relevamiento del equipo de IDEAR Tigre. PAMI figura como organismo nacional (es un instituto nacional). El Registro de la Propiedad Inmueble no se muestra: atiende a Tigre desde San Isidro.",
+      "estilo": {
+        "color": "#FFFFFF",
+        "relleno": "#16525A",
+        "radio": 8,
+        "grosor": 1.5,
+        "colorSegun": "nivel",
+        "colores": {
+          "Municipal": "#16525A",
+          "Provincial": "#D98C3A",
+          "Nacional": "#2F6FB0"
+        }
+      },
+      "campos": {
+        "nombre": "Nombre",
+        "nivel": "Nivel de gobierno",
+        "direccion": "Dirección",
+        "telefono": "Teléfono",
+        "localidad": "Localidad",
+        "descripcion": "Detalle"
+      },
+      "variables": [
+        {
+          "campo": "nivel",
+          "nombre": "Nivel de gobierno",
+          "tipo": "categoria",
+          "colores": {
+            "Municipal": "#16525A",
+            "Provincial": "#D98C3A",
+            "Nacional": "#2F6FB0"
+          }
+        },
+        {
+          "campo": "localidad",
+          "nombre": "Localidad",
+          "tipo": "categoria"
+        }
+      ]
     },
     {
       "id": "estaciones_tren",
