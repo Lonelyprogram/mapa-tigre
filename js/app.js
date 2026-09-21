@@ -1141,6 +1141,51 @@
     }
   }
 
+  // ---------- "Dar mi aporte": formulario que llega por correo (FormSubmit) ----------
+  function prepararAporte() {
+    const dlg = $("dialogoAporte");
+    const form = $("formAporte");
+    const cfg = estado.config.aportes || {};
+    const correo = (cfg.correo || "").trim();
+    const capas = $("aporteCapa");
+    capas.insertAdjacentHTML("beforeend", estado.config.capas
+      .map((d) => `<option value="${escapar(d.nombre)}">${escapar(d.grupo)} · ${escapar(d.nombre)}</option>`).join(""));
+
+    const abrir = () => {
+      $("aporteError").hidden = true;
+      if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", "");
+      $("aporteTipo").focus();
+    };
+    const cerrar = () => { if (typeof dlg.close === "function") dlg.close(); else dlg.removeAttribute("open"); };
+    $("abrirAporte").addEventListener("click", abrir);
+    $("cerrarAporte").addEventListener("click", cerrar);
+    $("cancelarAporte").addEventListener("click", cerrar);
+
+    form.addEventListener("submit", (e) => {
+      const error = (msg) => { e.preventDefault(); $("aporteError").textContent = msg; $("aporteError").hidden = false; };
+      if (!correo) return error("El formulario todavía no tiene un correo de destino configurado.");
+      const archivo = $("aporteArchivo").files[0];
+      if (archivo && archivo.size > 10 * 1024 * 1024) return error("El archivo pesa más de 10 MB. Comprimilo o mandá un link de descarga en el comentario.");
+      form.action = `https://formsubmit.co/${encodeURIComponent(correo)}`;
+      $("aporteAsunto").value = `${cfg.asunto || "Nuevo aporte al Geoportal de Tigre"}: ${$("aporteTipo").value}`;
+      $("aporteLink").value = $("aporteVista").checked ? location.href : "No incluida";
+      const vuelta = new URL(location.href);
+      vuelta.searchParams.set("aporte", "enviado");
+      $("aporteSiguiente").value = vuelta.toString();
+      $("enviarAporte").disabled = true;
+      $("enviarAporte").textContent = "Enviando…";
+    });
+
+    // al volver del envío, se agradece y se limpia la dirección
+    const ps = new URLSearchParams(location.search);
+    if (ps.get("aporte") === "enviado") {
+      avisar("¡Gracias! Tu aporte llegó al equipo de IDEAR Tigre.");
+      setTimeout(() => { if ($("aviso").textContent.startsWith("¡Gracias")) avisar(""); }, 8000);
+      ps.delete("aporte");
+      history.replaceState(null, "", `${location.pathname}${ps.toString() ? "?" + ps : ""}${location.hash}`);
+    }
+  }
+
   // ---------- inicio ----------
   async function iniciar() {
     prepararPanelMovil();
@@ -1172,6 +1217,7 @@
     prepararExplorar();
     prepararBusqueda();
     prepararEquipo();
+    prepararAporte();
     await leerUrl();
     cargarRestantes();
 
